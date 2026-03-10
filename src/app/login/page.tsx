@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Label } from "@/components/ui/label"
 import { useState, use } from "react"
+import { BiometricLogin } from "@/components/auth/biometric-login"
 
 export default function LoginPage({ searchParams }: { searchParams: Promise<{ error?: string }> }) {
     const [isDependent, setIsDependent] = useState(false)
@@ -20,6 +21,17 @@ export default function LoginPage({ searchParams }: { searchParams: Promise<{ er
                         <CardTitle>Iniciar Sesión</CardTitle>
                         <CardDescription>Accede a tu cuenta de Finanzas.</CardDescription>
                     </CardHeader>
+                    <div className="px-6 pb-2">
+                        <BiometricLogin />
+                        <div className="relative my-6">
+                            <div className="absolute inset-0 flex items-center">
+                                <span className="w-full border-t border-muted-foreground/20" />
+                            </div>
+                            <div className="relative flex justify-center text-xs uppercase">
+                                <span className="bg-background px-2 text-muted-foreground">O usa tu contraseña</span>
+                            </div>
+                        </div>
+                    </div>
                     <form action={login}>
                         <CardContent className="space-y-4">
                             <div className="space-y-2">
