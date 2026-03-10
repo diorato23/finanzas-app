@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useTransition } from "react"
+import { useEffect, useState, useTransition } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -29,10 +29,15 @@ export function EditTransactionSheet({
     transaccion: any,
     categoriasDisponibles: string[]
 }) {
+    const [mounted, setMounted] = useState(false)
     const [open, setOpen] = useState(false)
     const [isPending, startTransition] = useTransition()
     const [errorInfo, setErrorInfo] = useState<any>(null)
     const [montoVisual, setMontoVisual] = useState(formatToCurrencyInput(transaccion.monto))
+
+    useEffect(() => {
+        setMounted(true)
+    }, [])
 
     const handleMontoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const val = e.target.value
@@ -58,6 +63,15 @@ export function EditTransactionSheet({
     const defaultDate = transaccion.fecha_vencimiento
         ? new Date(transaccion.fecha_vencimiento).toISOString().split('T')[0]
         : ""
+
+    if (!mounted) {
+        return (
+            <Button variant="ghost" size="icon" className="h-8 w-8 text-indigo-500 hover:text-indigo-700 hover:bg-indigo-50" title="Editar Transacción">
+                <EditIcon className="w-4 h-4" />
+                <span className="sr-only">Editar</span>
+            </Button>
+        )
+    }
 
     return (
         <Sheet open={open} onOpenChange={setOpen}>
