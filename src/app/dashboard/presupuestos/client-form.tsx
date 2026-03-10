@@ -8,6 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { addPresupuesto } from "./actions"
 import { PlusCircle } from "lucide-react"
 import { useEffect, useState } from "react"
+import { getCategoryWithEmoji } from "@/lib/utils"
 
 export function PresupuestoClientForm({
     selectedMonth,
@@ -45,7 +46,7 @@ export function PresupuestoClientForm({
                             </SelectTrigger>
                             <SelectContent>
                                 {allCategories.map(cat => (
-                                    <SelectItem key={cat} value={cat}>{cat}</SelectItem>
+                                    <SelectItem key={cat} value={cat}>{getCategoryWithEmoji(cat)}</SelectItem>
                                 ))}
                             </SelectContent>
                         </Select>

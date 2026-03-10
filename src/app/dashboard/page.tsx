@@ -3,6 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { WalletIcon, TrendingUp, TrendingDown, PlusIcon, ListIcon } from "lucide-react"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
+import { SummaryCard } from "@/components/summary-card"
 
 function formatCOP(amount: number) {
     return new Intl.NumberFormat("es-CO", {
@@ -75,59 +76,27 @@ export default async function DashboardPage() {
 
             {/* SUMMARY CARDS (Agente Financeiro UX) */}
             <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-                {/* SALDO TOTAL */}
-                <Card className="rounded-[20px] shadow-sm hover:shadow-md transition-all duration-300 border-border/50">
-                    <CardContent className="p-6">
-                        <div className="w-11 h-11 rounded-lg bg-primary/10 text-primary flex items-center justify-center mb-4">
-                            <WalletIcon className="w-5 h-5" />
-                        </div>
-                        <h3 className="text-[12px] font-bold text-muted-foreground uppercase tracking-wide mb-1">
-                            Saldo Total
-                        </h3>
-                        <div className="text-3xl font-extrabold text-foreground tracking-tight">
-                            {formatCOP(saldoActual)}
-                        </div>
-                        <p className="text-[12px] font-medium text-muted-foreground mt-2 flex items-center gap-1">
-                            Efectivo actual disponible
-                        </p>
-                    </CardContent>
-                </Card>
-
-                {/* INGRESOS */}
-                <Card className="rounded-[20px] shadow-sm hover:shadow-md transition-all duration-300 border-border/50">
-                    <CardContent className="p-6">
-                        <div className="w-11 h-11 rounded-lg bg-emerald-100 text-emerald-600 flex items-center justify-center mb-4">
-                            <TrendingUp className="w-5 h-5" />
-                        </div>
-                        <h3 className="text-[12px] font-bold text-muted-foreground uppercase tracking-wide mb-1">
-                            Ingresos
-                        </h3>
-                        <div className="text-3xl font-extrabold text-emerald-600 tracking-tight">
-                            {formatCOP(totalIngresos)}
-                        </div>
-                        <p className="text-[12px] font-medium text-muted-foreground mt-2">
-                            Total esperado este mes
-                        </p>
-                    </CardContent>
-                </Card>
-
-                {/* GASTOS */}
-                <Card className="rounded-[20px] shadow-sm hover:shadow-md transition-all duration-300 border-border/50">
-                    <CardContent className="p-6">
-                        <div className="w-11 h-11 rounded-lg bg-rose-100 text-rose-600 flex items-center justify-center mb-4">
-                            <TrendingDown className="w-5 h-5" />
-                        </div>
-                        <h3 className="text-[12px] font-bold text-muted-foreground uppercase tracking-wide mb-1">
-                            Gastos
-                        </h3>
-                        <div className="text-3xl font-extrabold text-rose-600 tracking-tight">
-                            {formatCOP(totalGastos)}
-                        </div>
-                        <p className="text-[12px] font-medium text-muted-foreground mt-2">
-                            Total agendado este mes
-                        </p>
-                    </CardContent>
-                </Card>
+                <SummaryCard
+                    title="Saldo Total"
+                    amount={saldoActual}
+                    icon={WalletIcon}
+                    variant="default"
+                    description="Efetivo actual disponível"
+                />
+                <SummaryCard
+                    title="Ingresos"
+                    amount={totalIngresos}
+                    icon={TrendingUp}
+                    variant="success"
+                    description="Total esperado este mes"
+                />
+                <SummaryCard
+                    title="Gastos"
+                    amount={totalGastos}
+                    icon={TrendingDown}
+                    variant="danger"
+                    description="Total agendado este mes"
+                />
             </div>
 
             {/* SEÇÃO INFERIOR */}

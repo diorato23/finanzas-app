@@ -137,3 +137,39 @@ export async function deleteTransaccion(id: string) {
     revalidatePath("/dashboard")
     revalidatePath("/dashboard/transacciones")
 }
+
+// Função interna para ser usada pelo Webhook do n8n (sem FormData)
+export async function createTransaccionInternal(data: {
+    descripcion: string;
+    monto: number;
+    tipo: "pago" | "cobro";
+    categoria: string;
+    estado: "pendiente" | "pagado" | "recibido";
+    user_id: string;
+    familia_id: string;
+    fecha_vencimiento?: string | null;
+    comprobante_url?: string | null;
+}) {
+    const supabase = await createClient()
+
+    const { error } = await supabase
+        .from("transacciones")
+        .insert([{
+            ...data,
+            fecha_vencimiento: data.fecha_vencimiento || null,
+            comprobante_url: data.comprobante_url || null
+        }])
+
+    if (error) {
+        console.error("Erro no Webhook Insert:", error)
+        return { error: error.message }
+    }
+
+    revalidatePath("/dashboard")
+    revalidatePath("/dashboard/transacciones")
+    revalidatePath("/dashboard/informes")
+
+    return { success: true }
+}
+
+

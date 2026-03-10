@@ -7,6 +7,7 @@ import { Badge } from "@/components/ui/badge"
 import { PlusIcon, TrashIcon, CheckCircleIcon } from "lucide-react"
 import { updateTransaccionEstado, deleteTransaccion } from "./actions"
 import { EditTransactionSheet } from "./edit-sheet"
+import { getCategoryWithEmoji } from "@/lib/utils"
 
 function formatCOP(amount: number) {
     return new Intl.NumberFormat("es-CO", {
@@ -105,11 +106,11 @@ export default async function TransaccionesPage() {
                                         <TableCell className="font-medium">
                                             {t.descripcion}
                                             <div className="md:hidden text-xs text-muted-foreground mt-0.5">
-                                                {t.categoria}
+                                                {getCategoryWithEmoji(t.categoria)}
                                             </div>
                                         </TableCell>
                                         <TableCell className="hidden md:table-cell text-sm text-muted-foreground">
-                                            <span className="bg-secondary px-2 py-1 rounded-md border border-border/50">{t.categoria}</span>
+                                            <span className="bg-secondary px-2 py-1 rounded-md border border-border/50">{getCategoryWithEmoji(t.categoria)}</span>
                                         </TableCell>
                                         <TableCell className="hidden lg:table-cell text-sm text-muted-foreground">
                                             {t.perfiles?.nombre || 'Desconocido'}

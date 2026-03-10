@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { getCategoryWithEmoji } from "@/lib/utils"
 
 const formatToCurrencyInput = (value: string) => {
     // 1. Remove anything that isn't a digit
@@ -108,7 +109,7 @@ export default function NuevaTransaccionClient({ categoriasDisponibles }: { cate
                                     </SelectTrigger>
                                     <SelectContent>
                                         {categoriasDisponibles.map((cat, idx) => (
-                                            <SelectItem key={idx} value={cat}>{cat}</SelectItem>
+                                            <SelectItem key={idx} value={cat}>{getCategoryWithEmoji(cat)}</SelectItem>
                                         ))}
                                     </SelectContent>
                                 </Select>

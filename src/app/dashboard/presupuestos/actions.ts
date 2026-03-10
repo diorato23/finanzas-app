@@ -17,10 +17,10 @@ export async function addPresupuesto(formData: FormData) {
         categoria: formData.get("categoria"),
         monto_limite: formData.get("monto_limite"),
         mes_anio: formData.get("mes_anio"),
-    })
+    } as unknown)
 
     if (!result.success) {
-        return { error: result.error.errors[0].message }
+        return { error: result.error.issues[0].message }
     }
 
     const { data: { user } } = await supabase.auth.getUser()

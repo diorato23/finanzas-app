@@ -1,10 +1,22 @@
 "use client"
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts'
+import dynamic from 'next/dynamic'
 import { TrendingUp, TrendingDown, ArrowRightLeft, Printer, FileText } from "lucide-react"
 import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
+
+// Carregamento dinâmico para reduzir bundle size inicial
+const ResponsiveContainer = dynamic(() => import('recharts').then(mod => mod.ResponsiveContainer), { ssr: false })
+const LineChart = dynamic(() => import('recharts').then(mod => mod.LineChart), { ssr: false })
+const Line = dynamic(() => import('recharts').then(mod => mod.Line), { ssr: false })
+const XAxis = dynamic(() => import('recharts').then(mod => mod.XAxis), { ssr: false })
+const YAxis = dynamic(() => import('recharts').then(mod => mod.YAxis), { ssr: false })
+const CartesianGrid = dynamic(() => import('recharts').then(mod => mod.CartesianGrid), { ssr: false })
+const Tooltip = dynamic(() => import('recharts').then(mod => mod.Tooltip), { ssr: false })
+const Legend = dynamic(() => import('recharts').then(mod => mod.Legend), { ssr: false })
+
+import { getCategoryWithEmoji } from "@/lib/utils"
 
 type InformeData = {
     mes: string
@@ -132,7 +144,7 @@ export function RelatorioClient({ categories }: { categories: CategoriaData[] })
                             >
                                 <option value="todas">Todas</option>
                                 {categories && categories.length > 0 && categories.map((cat, i) => (
-                                    <option key={i} value={cat.nombre}>{cat.nombre}</option>
+                                    <option key={i} value={cat.nombre}>{getCategoryWithEmoji(cat.nombre)}</option>
                                 ))}
                             </select>
                         </div>

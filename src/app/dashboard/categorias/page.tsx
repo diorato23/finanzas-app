@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { TrashIcon, TagsIcon } from "lucide-react"
 import { addCategoria, deleteCategoria } from "./actions"
+import { getCategoryWithEmoji } from "@/lib/utils"
 
 export default async function CategoriasPage() {
     const supabase = await createClient()
@@ -75,7 +76,7 @@ export default async function CategoriasPage() {
                             <TableBody>
                                 {categorias?.map((c) => (
                                     <TableRow key={c.id}>
-                                        <TableCell className="font-semibold text-foreground">{c.nombre}</TableCell>
+                                        <TableCell className="font-semibold text-foreground">{getCategoryWithEmoji(c.nombre)}</TableCell>
                                         <TableCell className="text-right">
                                             {isAdmin ? (
                                                 <form action={async () => {

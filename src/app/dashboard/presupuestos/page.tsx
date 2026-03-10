@@ -8,6 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { TrashIcon, AlertCircle, TrendingDown } from "lucide-react"
 import { deletePresupuesto } from "./actions"
 import { PresupuestoClientForm } from "./client-form"
+import { getCategoryWithEmoji } from "@/lib/utils"
 
 export default async function PresupuestosPage({ searchParams }: { searchParams: Promise<{ mes_anio?: string }> }) {
     const supabase = await createClient()
@@ -140,13 +141,16 @@ export default async function PresupuestosPage({ searchParams }: { searchParams:
                                     <CardContent className="p-5">
                                         <div className="flex justify-between items-start mb-2">
                                             <div>
-                                                <h3 className="font-semibold text-lg text-foreground">{pres.categoria}</h3>
+                                                <h3 className="font-semibold text-lg text-foreground">{getCategoryWithEmoji(pres.categoria)}</h3>
                                                 <p className="text-sm font-medium text-muted-foreground">
                                                     {formatCurrency(gasto)} gastados de {formatCurrency(limite)}
                                                 </p>
                                             </div>
                                             {isAdmin && (
-                                                <form action={deletePresupuesto}>
+                                                <form action={async (formData) => {
+                                                    "use server"
+                                                    await deletePresupuesto(formData)
+                                                }}>
                                                     <input type="hidden" name="id" value={pres.id} />
                                                     <Button type="submit" variant="ghost" size="icon" className="h-8 w-8 text-rose-500 hover:text-rose-700 hover:bg-rose-50 -mt-1 -mr-1">
                                                         <TrashIcon className="w-4 h-4" />

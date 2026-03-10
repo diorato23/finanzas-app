@@ -8,6 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet"
 import { editTransaccion } from "./actions"
 import { EditIcon } from "lucide-react"
+import { getCategoryWithEmoji } from "@/lib/utils"
 
 const formatToCurrencyInput = (value: string | number) => {
     const stringVal = String(value)
@@ -119,7 +120,7 @@ export function EditTransactionSheet({
                                 </SelectTrigger>
                                 <SelectContent>
                                     {categoriasDisponibles.map((cat, idx) => (
-                                        <SelectItem key={idx} value={cat}>{cat}</SelectItem>
+                                        <SelectItem key={idx} value={cat}>{getCategoryWithEmoji(cat)}</SelectItem>
                                     ))}
                                 </SelectContent>
                             </Select>
