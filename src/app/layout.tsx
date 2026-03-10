@@ -7,7 +7,18 @@ const outfit = Outfit({ subsets: ["latin"], variable: "--font-sans" })
 
 export const metadata = {
   title: "Finanzas Familiares",
-  description: "Control financiero personal y familiar",
+  description: "Control financiero personal y familiar con IA",
+  manifest: "/manifest.json",
+  themeColor: "#09090b",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "default",
+    title: "Finanzas App",
+  },
+  icons: {
+    icon: "/favicon.ico",
+    apple: "/icons/apple-touch-icon.png",
+  },
 }
 
 export default function RootLayout({
