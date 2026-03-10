@@ -2,6 +2,7 @@
 
 import { useTransition, useState } from "react"
 import { createTransaccion } from "../actions"
+import { toast } from "sonner"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -40,9 +41,20 @@ export default function NuevaTransaccionClient({ categoriasDisponibles }: { cate
         // Enforce the raw value into formData programmatically before dispatching
         formData.set("monto", unformatCurrency(montoVisual))
 
-        startTransition(async () => {
+        const promise = () => new Promise(async (resolve, reject) => {
             const res = await createTransaccion(formData)
-            if (res?.error) setErrorInfo(res)
+            if (res?.error) {
+                setErrorInfo(res)
+                reject(res.error)
+            } else {
+                resolve(res)
+            }
+        })
+
+        toast.promise(promise(), {
+            loading: 'Guardando transacción...',
+            success: '¡Transacción guardada con éxito!',
+            error: (err) => err || 'Error al guardar la transacción',
         })
     }
 

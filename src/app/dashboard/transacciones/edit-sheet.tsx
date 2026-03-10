@@ -7,6 +7,7 @@ import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet"
 import { editTransaccion } from "./actions"
+import { toast } from "sonner"
 import { EditIcon } from "lucide-react"
 import { getCategoryWithEmoji } from "@/lib/utils"
 
@@ -49,13 +50,22 @@ export function EditTransactionSheet({
         formData.set("monto", unformatCurrency(montoVisual))
 
         setErrorInfo(null)
-        startTransition(async () => {
+
+        const promise = () => new Promise(async (resolve, reject) => {
             const res = await editTransaccion(formData)
             if (res?.error) {
                 setErrorInfo(res)
+                reject(res.error)
             } else {
-                setOpen(false) // Fecha a gaveta com sucesso
+                setOpen(false)
+                resolve(res)
             }
+        })
+
+        toast.promise(promise(), {
+            loading: 'Actualizando transacción...',
+            success: '¡Transacción actualizada!',
+            error: (err) => err || 'Error ao actualizar',
         })
     }
 
