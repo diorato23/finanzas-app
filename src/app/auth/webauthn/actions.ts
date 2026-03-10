@@ -6,6 +6,7 @@ import {
     generateAuthenticationOptions,
     verifyAuthenticationResponse,
 } from "@simplewebauthn/server"
+import type { AuthenticatorTransportFuture } from "@simplewebauthn/server"
 import { createClient } from "@/lib/supabase/server"
 import { cookies } from "next/headers"
 import { revalidatePath } from "next/cache"
