@@ -48,7 +48,13 @@ export default function RootLayout({
         >
           <ServiceWorkerRegister />
           {children}
-          <Toaster richColors closeButton position="bottom-center" />
+          <Toaster
+            richColors
+            closeButton
+            position="bottom-center"
+            duration={3000}
+            offset={80}
+          />
         </ThemeProvider>
       </body>
     </html>
