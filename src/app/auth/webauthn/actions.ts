@@ -30,12 +30,13 @@ export async function getRegistrationOptions() {
     const options = await generateRegistrationOptions({
         rpName: "Finanzas App",
         rpID: RP_ID,
-        userID: user.id,
+        userID: Buffer.from(user.id),
         userName: user.email || "usuario@app.com",
         attestationType: "none",
         excludeCredentials: credentials?.map((c) => ({
             id: c.credential_id,
             type: "public-key",
+            transports: ['internal'] as AuthenticatorTransportFuture[],
         })),
         authenticatorSelection: {
             residentKey: "preferred",
@@ -76,11 +77,12 @@ export async function verifyRegistration(body: any) {
     })
 
     if (verification.verified && verification.registrationInfo) {
-        const { credentialID, publicKey, counter } = verification.registrationInfo
+        const { credential } = verification.registrationInfo
+        const { id, publicKey, counter } = credential
 
         const { error } = await supabase.from("user_credentials").insert({
             user_id: user.id,
-            credential_id: Buffer.from(credentialID).toString("base64url"),
+            credential_id: Buffer.from(id).toString("base64url"),
             public_key: Buffer.from(publicKey).toString("base64url"),
             counter,
             name: "Dispositivo Biométrico",
@@ -143,9 +145,9 @@ export async function verifyAuthentication(body: any) {
         expectedChallenge,
         expectedOrigin: ORIGIN,
         expectedRPID: RP_ID,
-        authenticator: {
-            credentialID: Buffer.from(dbCredential.credential_id, "base64url"),
-            credentialPublicKey: Buffer.from(dbCredential.public_key, "base64url"),
+        credential: {
+            id: dbCredential.credential_id,
+            publicKey: Buffer.from(dbCredential.public_key, "base64url"),
             counter: Number(dbCredential.counter),
         },
     })

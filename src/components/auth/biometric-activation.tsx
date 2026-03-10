@@ -31,7 +31,7 @@ export function BiometricActivation() {
 
             // 2. Acionar hardware do dispositivo (FaceID/TouchID)
             const regResponse = await startRegistration({
-                ...options,
+                optionsJSON: options,
             })
 
             // 3. Verificar no servidor
