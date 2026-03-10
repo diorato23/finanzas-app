@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { SummaryCardsWrapper } from "@/components/dashboard/summary-cards-wrapper"
 import { RecentMovementsWrapper } from "@/components/dashboard/recent-movements-wrapper"
+import { MetricsChartWrapper } from "@/components/dashboard/metrics-chart-wrapper"
 import { Skeleton } from "@/components/ui/skeleton"
 
 function SummaryCardsSkeleton() {
@@ -50,6 +51,10 @@ export default async function DashboardPage() {
             {/* DASHBOARD STREAMING SECTION */}
             <Suspense fallback={<SummaryCardsSkeleton />}>
                 <SummaryCardsWrapper />
+            </Suspense>
+
+            <Suspense fallback={<Skeleton className="h-[400px] w-full rounded-[24px]" />}>
+                <MetricsChartWrapper />
             </Suspense>
 
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
