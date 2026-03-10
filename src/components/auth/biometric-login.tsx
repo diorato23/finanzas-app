@@ -26,11 +26,16 @@ export function BiometricLogin() {
             // 3. Verificar no servidor
             const result = await verifyAuthentication(authResponse)
 
-            if (result.success) {
+            if (result.success && result.redirectUrl) {
                 toast.success("¡Acceso concedido!", {
                     description: "Ingresando con biometría...",
                 })
-                // O servidor já deve ter configurado os cookies de sessão ou gerado o redirecionamento
+                // O servidor gerou um link de login seguro
+                router.push(result.redirectUrl)
+            } else if (result.success) {
+                toast.success("¡Acceso concedido!", {
+                    description: "Ingresando...",
+                })
                 router.push("/dashboard")
                 router.refresh()
             }

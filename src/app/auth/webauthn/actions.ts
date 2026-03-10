@@ -3,11 +3,11 @@
 import {
     generateRegistrationOptions,
     verifyRegistrationResponse,
-    generateAuthenticationOptions,
     verifyAuthenticationResponse,
 } from "@simplewebauthn/server"
 import type { AuthenticatorTransportFuture } from "@simplewebauthn/server"
 import { createClient } from "@/lib/supabase/server"
+import { createAdminClient } from "@/lib/supabase/admin"
 import { cookies } from "next/headers"
 import { revalidatePath } from "next/cache"
 
@@ -154,15 +154,25 @@ export async function verifyAuthentication(body: any) {
     })
 
     if (verification.verified) {
-        // Se verificado, precisamos logar o usuário no Supabase.
-        // O Supabase não tem login direto por WebAuthn nativo (sem usar o Auth deles), 
-        // então aqui usaríamos um Custom JWT ou uma sessão administrativa temporária.
+        // Encontrar o e-mail do usuário para gerar o link de login
+        const { data: userData, error: userError } = await supabase.auth.admin.getUserById(dbCredential.user_id)
 
-        // ESTRATÉGIA: Como é um app de controle interno, podemos usar o 
-        // ID do usuário recuperado do banco e criar uma sessão via Admin Auth 
-        // (servidor-side ONLY) se o Supabase Admin estiver configurado.
+        if (userError || !userData.user?.email) {
+            // Fallback: se o client padrão não tiver permissão, usamos o admin
+            const admin = createAdminClient()
+            const { data: adminUser } = await admin.auth.admin.getUserById(dbCredential.user_id)
+            if (!adminUser.user?.email) throw new Error("Usuário não encontrado")
 
-        // Por enquanto, retornaremos sucesso para o cliente prosseguir.
+            const { data: linkData } = await admin.auth.admin.generateLink({
+                type: 'magiclink',
+                email: adminUser.user.email,
+            })
+
+            // Logar via Admin não seta cookies no cliente automaticamente 
+            // Então retornamos o link para o cliente "clicar" via router.push
+            return { success: true, redirectUrl: linkData.properties?.action_link }
+        }
+
         return { success: true, userId: dbCredential.user_id }
     }
 
