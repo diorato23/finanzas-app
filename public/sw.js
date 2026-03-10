@@ -1,4 +1,4 @@
-const CACHE_NAME = 'finanzas-app-v1';
+const CACHE_NAME = 'finanzas-app-v2';
 const ASSETS_TO_CACHE = [
     '/',
     '/manifest.json',
@@ -8,7 +8,6 @@ const ASSETS_TO_CACHE = [
     '/favicon.ico'
 ];
 
-// Instalação: Cacheia arquivos básicos
 self.addEventListener('install', (event) => {
     event.waitUntil(
         caches.open(CACHE_NAME).then((cache) => {
@@ -19,50 +18,78 @@ self.addEventListener('install', (event) => {
     self.skipWaiting();
 });
 
-// Ativação: Limpa caches antigos
 self.addEventListener('activate', (event) => {
     event.waitUntil(
         caches.keys().then((cacheNames) => {
             return Promise.all(
-                cacheNames.filter((name) => name !== CACHE_NAME).map((name) => caches.delete(name))
+                cacheNames.map((name) => {
+                    if (name !== CACHE_NAME) {
+                        return caches.delete(name);
+                    }
+                })
             );
         })
     );
     self.clients.claim();
 });
 
-// Estratégia Stale-While-Revalidate: Serve do cache e atualiza por trás
 self.addEventListener('fetch', (event) => {
-    // Ignora requisições para a API do Supabase e extensões do navegador
-    if (event.request.url.includes('supabase.co') || !event.request.url.startsWith('http')) {
+    const { request } = event;
+    const url = new URL(request.url);
+
+    // Só intercepta requisições do mesmo domínio
+    if (url.origin !== self.location.origin) {
         return;
     }
 
-    event.respondWith(
-        caches.match(event.request).then((response) => {
-            if (response) {
-                // Retorna o cache e tenta atualizar em segundo plano
-                fetch(event.request).then((networkResponse) => {
+    // Ignora requisições de API para o Supabase e arquivos de dados do Next.js (esses exigem rede)
+    if (url.pathname.startsWith('/api/') || url.pathname.startsWith('/_next/data/')) {
+        event.respondWith(
+            fetch(request).catch(() => {
+                return caches.match(request);
+            })
+        );
+        return;
+    }
+
+    // Estratégia de Cache-First para Ativos Estáticos (JS de chunks, CSS, Imagens)
+    if (url.pathname.startsWith('/_next/static/') || url.pathname.startsWith('/icons/') || request.destination === 'image' || request.destination === 'script' || request.destination === 'style') {
+        event.respondWith(
+            caches.match(request).then((cachedResponse) => {
+                if (cachedResponse) return cachedResponse;
+
+                return fetch(request).then((networkResponse) => {
                     if (networkResponse && networkResponse.status === 200) {
-                        caches.open(CACHE_NAME).then((cache) => {
-                            cache.put(event.request, networkResponse.clone());
-                        });
+                        const responseToCache = networkResponse.clone();
+                        caches.open(CACHE_NAME).then((cache) => cache.put(request, responseToCache));
+                    }
+                    return networkResponse;
+                }).catch(() => {
+                    // Fallback para imagens se offline e não cacheado
+                    if (request.destination === 'image') {
+                        return caches.match('/icons/icon-192x192.png');
                     }
                 });
-                return response;
-            }
+            })
+        );
+        return;
+    }
 
-            return fetch(event.request).then((networkResponse) => {
-                if (!networkResponse || networkResponse.status !== 200 || networkResponse.type !== 'basic') {
-                    return networkResponse;
-                }
-
+    // Estratégia de Network-First com Fallback para Cache (para HTML e navegação principal)
+    event.respondWith(
+        fetch(request).then((networkResponse) => {
+            if (networkResponse && networkResponse.status === 200) {
                 const responseToCache = networkResponse.clone();
-                caches.open(CACHE_NAME).then((cache) => {
-                    cache.put(event.request, responseToCache);
-                });
-
-                return networkResponse;
+                caches.open(CACHE_NAME).then((cache) => cache.put(request, responseToCache));
+            }
+            return networkResponse;
+        }).catch(() => {
+            return caches.match(request).then((cachedResponse) => {
+                if (cachedResponse) return cachedResponse;
+                // Se for navegação e não tem no cache, retorna o root (SPA behavior)
+                if (request.mode === 'navigate') {
+                    return caches.match('/');
+                }
             });
         })
     );
