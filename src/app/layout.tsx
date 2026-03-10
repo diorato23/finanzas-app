@@ -3,6 +3,7 @@ import { Outfit } from "next/font/google"
 import "./globals.css"
 import { ThemeProvider } from "@/components/theme-provider"
 import { ServiceWorkerRegister } from "@/components/pwa-register"
+import { Toaster } from "sonner"
 
 import { Metadata, Viewport } from "next"
 
@@ -47,6 +48,7 @@ export default function RootLayout({
         >
           <ServiceWorkerRegister />
           {children}
+          <Toaster richColors closeButton position="bottom-center" />
         </ThemeProvider>
       </body>
     </html>
