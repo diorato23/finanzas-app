@@ -3,6 +3,7 @@
 import {
     generateRegistrationOptions,
     verifyRegistrationResponse,
+    generateAuthenticationOptions,
     verifyAuthenticationResponse,
 } from "@simplewebauthn/server"
 import type { AuthenticatorTransportFuture } from "@simplewebauthn/server"
