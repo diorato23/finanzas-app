@@ -6,6 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { SummaryCardsWrapper } from "@/components/dashboard/summary-cards-wrapper"
 import { RecentMovementsWrapper } from "@/components/dashboard/recent-movements-wrapper"
 import { MetricsChartWrapper } from "@/components/dashboard/metrics-chart-wrapper"
+import { BiometricActivation } from "@/components/auth/biometric-activation"
 import { Skeleton } from "@/components/ui/skeleton"
 
 function SummaryCardsSkeleton() {
@@ -47,6 +48,8 @@ export default async function DashboardPage() {
                     </Button>
                 </div>
             </div>
+
+            <BiometricActivation />
 
             {/* DASHBOARD STREAMING SECTION */}
             <Suspense fallback={<SummaryCardsSkeleton />}>
