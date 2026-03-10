@@ -4,16 +4,25 @@ import "./globals.css"
 import { ThemeProvider } from "@/components/theme-provider"
 import { ServiceWorkerRegister } from "@/components/pwa-register"
 
+import { Metadata, Viewport } from "next"
+
 const outfit = Outfit({ subsets: ["latin"], variable: "--font-sans" })
 
-export const metadata = {
-  title: "Finanzas Familiares",
-  description: "Control financiero personal y familiar con IA",
-  manifest: "/manifest.json",
+export const viewport: Viewport = {
   themeColor: "#09090b",
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 1,
+  userScalable: false,
+}
+
+export const metadata: Metadata = {
+  title: "Finanzas App",
+  description: "Controle financeiro inteligente",
+  manifest: "/manifest.json",
   appleWebApp: {
     capable: true,
-    statusBarStyle: "default",
+    statusBarStyle: "black-translucent",
     title: "Finanzas App",
   },
   icons: {
