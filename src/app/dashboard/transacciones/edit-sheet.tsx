@@ -10,6 +10,8 @@ import { editTransaccion } from "./actions"
 import { toast } from "sonner"
 import { EditIcon } from "lucide-react"
 import { getCategoryWithEmoji } from "@/lib/utils"
+import { suggestCategory } from "@/app/actions/ai-categorize"
+import { SparklesIcon } from "lucide-react"
 
 const formatToCurrencyInput = (value: string | number) => {
     const stringVal = String(value)
@@ -35,6 +37,9 @@ export function EditTransactionSheet({
     const [isPending, startTransition] = useTransition()
     const [errorInfo, setErrorInfo] = useState<any>(null)
     const [montoVisual, setMontoVisual] = useState(formatToCurrencyInput(transaccion.monto))
+    const [description, setDescription] = useState(transaccion.descripcion)
+    const [categoria, setCategoria] = useState(transaccion.categoria || categoriasDisponibles[0])
+    const [isAiLoading, setIsAiLoading] = useState(false)
 
     useEffect(() => {
         setMounted(true)
@@ -43,6 +48,26 @@ export function EditTransactionSheet({
     const handleMontoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const val = e.target.value
         setMontoVisual(formatToCurrencyInput(val))
+    }
+
+    const handleAiSuggestion = async () => {
+        if (description.length > 3) {
+            setIsAiLoading(true)
+            try {
+                const suggestion = await suggestCategory(description, categoriasDisponibles)
+                if (suggestion) {
+                    setCategoria(suggestion)
+                    toast.success(`IA sugeriu: ${suggestion}`, {
+                        icon: <SparklesIcon className="h-4 w-4 text-primary" />,
+                        duration: 2000
+                    })
+                }
+            } catch (err) {
+                console.error("AI Error:", err)
+            } finally {
+                setIsAiLoading(false)
+            }
+        }
     }
 
     const handleSubmit = (formData: FormData) => {
@@ -132,13 +157,23 @@ export function EditTransactionSheet({
 
                     <div className="space-y-2">
                         <Label htmlFor="descripcion">Descripción</Label>
-                        <Input type="text" id="descripcion" name="descripcion" defaultValue={transaccion.descripcion} required />
+                        <Input
+                            type="text"
+                            id="descripcion"
+                            name="descripcion"
+                            value={description}
+                            onChange={(e) => setDescription(e.target.value)}
+                            onBlur={handleAiSuggestion}
+                            required
+                            className={isAiLoading ? "animate-pulse border-primary/50" : ""}
+                        />
+                        {isAiLoading && <p className="text-[10px] text-primary animate-pulse font-medium">IA pensando...</p>}
                     </div>
 
                     <div className="grid grid-cols-2 gap-4">
                         <div className="space-y-2">
                             <Label htmlFor="categoria">Categoría</Label>
-                            <Select name="categoria" required defaultValue={transaccion.categoria || categoriasDisponibles[0]}>
+                            <Select name="categoria" required value={categoria} onValueChange={setCategoria}>
                                 <SelectTrigger id="categoria">
                                     <SelectValue placeholder="Seleccionar..." />
                                 </SelectTrigger>

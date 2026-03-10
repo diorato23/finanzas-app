@@ -9,6 +9,8 @@ import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { getCategoryWithEmoji } from "@/lib/utils"
+import { suggestCategory } from "@/app/actions/ai-categorize"
+import { SparklesIcon } from "lucide-react"
 
 const formatToCurrencyInput = (value: string) => {
     // 1. Remove anything that isn't a digit
@@ -27,6 +29,9 @@ export default function NuevaTransaccionClient({ categoriasDisponibles }: { cate
     const [isPending, startTransition] = useTransition()
     const [errorInfo, setErrorInfo] = useState<any>(null)
     const [montoVisual, setMontoVisual] = useState("")
+    const [description, setDescription] = useState("")
+    const [categoria, setCategoria] = useState(categoriasDisponibles[0])
+    const [isAiLoading, setIsAiLoading] = useState(false)
 
     const handleMontoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const val = e.target.value
@@ -35,6 +40,26 @@ export default function NuevaTransaccionClient({ categoriasDisponibles }: { cate
 
     const unformatCurrency = (formatted: string) => {
         return formatted.replace(/\D/g, "")
+    }
+
+    const handleAiSuggestion = async () => {
+        if (description.length > 3) {
+            setIsAiLoading(true)
+            try {
+                const suggestion = await suggestCategory(description, categoriasDisponibles)
+                if (suggestion) {
+                    setCategoria(suggestion)
+                    toast.success(`IA sugeriu: ${suggestion}`, {
+                        icon: <SparklesIcon className="h-4 w-4 text-primary" />,
+                        duration: 2000
+                    })
+                }
+            } catch (err) {
+                console.error("AI Error:", err)
+            } finally {
+                setIsAiLoading(false)
+            }
+        }
     }
 
     const handleSubmit = (formData: FormData) => {
@@ -109,13 +134,24 @@ export default function NuevaTransaccionClient({ categoriasDisponibles }: { cate
 
                         <div className="space-y-2">
                             <Label htmlFor="descripcion">Descripción</Label>
-                            <Input type="text" id="descripcion" name="descripcion" placeholder="Alquiler, Mercado, Salario..." required />
+                            <Input
+                                type="text"
+                                id="descripcion"
+                                name="descripcion"
+                                placeholder="Alquiler, Mercado, Salario..."
+                                required
+                                value={description}
+                                onChange={(e) => setDescription(e.target.value)}
+                                onBlur={handleAiSuggestion}
+                                className={isAiLoading ? "animate-pulse border-primary/50" : ""}
+                            />
+                            {isAiLoading && <p className="text-[10px] text-primary animate-pulse font-medium">IA pensando...</p>}
                         </div>
 
                         <div className="grid grid-cols-2 gap-4">
                             <div className="space-y-2">
                                 <Label htmlFor="categoria">Categoría</Label>
-                                <Select name="categoria" required defaultValue={categoriasDisponibles[0]}>
+                                <Select name="categoria" required value={categoria} onValueChange={setCategoria}>
                                     <SelectTrigger id="categoria">
                                         <SelectValue placeholder="Seleccionar..." />
                                     </SelectTrigger>
