@@ -1,8 +1,7 @@
-"use client"
-
 import { useTransition, useState } from "react"
 import { createTransaccion } from "../actions"
 import { toast } from "sonner"
+import { db } from "@/lib/db-local"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
@@ -126,17 +125,45 @@ export default function NuevaTransaccionClient({ categoriasDisponibles }: { cate
     }
 
     const onSubmit = (values: z.infer<typeof formSchema>) => {
+        const amount = Number(unformatCurrency(values.montoVisual))
+        
+        setErrorInfo(null)
+
+        // Lógica Offline-First
+        if (!navigator.onLine) {
+            startTransition(async () => {
+                try {
+                    await db.pendingTransactions.add({
+                        descripcion: values.descripcion,
+                        monto: amount,
+                        tipo: values.tipo,
+                        categoria: values.categoria,
+                        estado: values.estado,
+                        fecha_vencimiento: values.fecha_vencimiento || null,
+                        created_at: new Date().toISOString(),
+                    })
+                    toast.success("Salvo localmente (Offline) 📶", {
+                        description: "Sincronizaremos quando você tiver internet.",
+                        duration: 5000
+                    })
+                    form.reset()
+                } catch (err) {
+                    toast.error("Erro ao salvar offline")
+                    console.error(err)
+                }
+            })
+            return
+        }
+
         const formData = new FormData()
         formData.append("tipo", values.tipo)
-        formData.append("monto", unformatCurrency(values.montoVisual))
+        formData.append("monto", amount.toString())
         formData.append("descripcion", values.descripcion)
         formData.append("categoria", values.categoria)
         formData.append("estado", values.estado)
         if (values.fecha_vencimiento) {
             formData.append("fecha_vencimiento", values.fecha_vencimiento)
         }
-
-        setErrorInfo(null)
 
         startTransition(async () => {
             const res = await createTransaccion(formData)

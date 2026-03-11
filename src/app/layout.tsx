@@ -32,6 +32,8 @@ export const metadata: Metadata = {
   },
 }
 
+import { OfflineSyncProvider } from "@/components/offline-sync-provider"
+
 export default function RootLayout({
   children,
 }: {
@@ -47,7 +49,9 @@ export default function RootLayout({
           disableTransitionOnChange
         >
           <ServiceWorkerRegister />
-          {children}
+          <OfflineSyncProvider>
+            {children}
+          </OfflineSyncProvider>
           <Toaster
             richColors
             closeButton
