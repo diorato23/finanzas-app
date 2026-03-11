@@ -10,6 +10,8 @@ interface SummaryCardProps {
     description?: string;
 }
 
+import { AnimatedBalance } from "@/components/ui/animated-balance";
+
 export function SummaryCard({
     title,
     amount,
@@ -17,13 +19,6 @@ export function SummaryCard({
     variant = "default",
     description,
 }: SummaryCardProps) {
-    const formatCurrency = (value: number) => {
-        return new Intl.NumberFormat("pt-BR", {
-            style: "currency",
-            currency: "BRL",
-        }).format(value);
-    };
-
     return (
         <Card className="overflow-hidden border-none bg-background/50 backdrop-blur-md shadow-lg hover:shadow-xl transition-all duration-300">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
@@ -41,7 +36,7 @@ export function SummaryCard({
             </CardHeader>
             <CardContent>
                 <div className="text-2xl font-bold tracking-tight">
-                    {formatCurrency(amount)}
+                    <AnimatedBalance value={amount} />
                 </div>
                 {description && (
                     <p className="text-xs text-muted-foreground mt-1">
