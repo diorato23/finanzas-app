@@ -51,7 +51,17 @@ export async function POST(req: NextRequest) {
             .single();
 
         if (perfilError || !perfil) {
-            return NextResponse.json({ error: "Usuario no encontrado para este número de WhatsApp" }, { status: 404 });
+            return NextResponse.json({ 
+                error: "Usuario no encontrado para este número de WhatsApp",
+                diagnostico: {
+                    whatsapp_buscado: whatsapp,
+                    whatsapp_tipo: typeof whatsapp,
+                    whatsapp_length: whatsapp?.length,
+                    service_role_loaded: !!process.env.SUPABASE_SERVICE_ROLE_KEY,
+                    supabase_url_loaded: !!process.env.NEXT_PUBLIC_SUPABASE_URL,
+                    supabase_error: perfilError?.message || "perfil is null"
+                }
+            }, { status: 404 });
         }
 
         // 3. Create transaction
