@@ -4,13 +4,13 @@ import { generateObject } from 'ai';
 import { google } from '@ai-sdk/google';
 import { z } from 'zod';
 
-// O schema ajustado para a realidade do Peso Colombiano (COP)
+// El schema ajustado para la realidad del Peso Colombiano (COP)
 const transactionSchema = z.object({
-  amount: z.number().describe('O valor exato da transação. Remova o símbolo $ e os pontos de separação de milhar. Exemplo: se o texto diz "$ 15.000", retorne 15000.'),
-  type: z.enum(['income', 'expense']).describe('Se é uma entrada (income) ou saída (expense).'),
-  description: z.string().describe('Nome limpo e comercial do estabelecimento ou pessoa. Remova códigos inúteis do banco.'),
-  date: z.string().describe('Data no formato YYYY-MM-DD. Se o SMS disser "hoy", use a data de hoje.'),
-  suggestedCategory: z.string().describe('A categoria que melhor se encaixa na descrição.'),
+  amount: z.number().describe('El valor exacto de la transacción. Elimina el símbolo $ y los puntos de separación de miles. Ejemplo: si el texto dice "$ 15.000", retorna 15000.'),
+  type: z.enum(['income', 'expense']).describe('Si es una entrada (income) o salida (expense).'),
+  description: z.string().describe('Nombre limpio y comercial del establecimiento o persona. Elimina códigos inútiles del banco.'),
+  date: z.string().describe('Fecha en formato YYYY-MM-DD. Si el SMS dice "hoy", usa la fecha de hoy.'),
+  suggestedCategory: z.string().describe('La categoría que mejor encaja con la descripción.'),
 });
 
 export async function parseTransactionText(rawText: string, availableCategories: string[]) {

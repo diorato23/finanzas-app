@@ -204,7 +204,7 @@ export default function NuevaTransaccionClient({ categoriasDisponibles }: { cate
                             placeholder="Ej: ¡Listo! Pagaste $ 18.500 en RAPPI S.A.S con tu Tarjeta Nequi..."
                             value={rawSms}
                             onChange={(e) => setRawSms(e.target.value)}
-                            className="flex min-h-[60px] w-full rounded-md border border-indigo-200 bg-white px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 resize-none transition-colors"
+                            className="flex min-h-[60px] w-full rounded-md border border-indigo-200 bg-white px-3 py-2 text-sm text-slate-950 ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 resize-none transition-colors"
                         />
                         <Button 
                             type="button" 
