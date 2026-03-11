@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
-import { createTransaccionInternal } from "@/app/dashboard/transacciones/actions";
 
 export const dynamic = "force-dynamic";
 
@@ -17,33 +16,46 @@ async function parseBody(req: NextRequest): Promise<Record<string, unknown>> {
 
 export async function POST(req: NextRequest) {
     const authHeader = req.headers.get("authorization")?.trim() || "";
-
-    // Strips accidental quotes or trailing spaces injected by Docker .env
     const rawSecret = process.env.N8N_WEBHOOK_SECRET;
     const cleanSecret = rawSecret?.replace(/['"]/g, "")?.trim();
 
-    // 1. Validate Secret
     if (!cleanSecret || authHeader !== `Bearer ${cleanSecret}`) {
         return NextResponse.json({ error: "No autorizado" }, { status: 401 });
     }
 
     try {
         const body = await parseBody(req);
-        const { whatsapp, descripcion, monto, tipo, categoria, estado, fecha_vencimiento, comprobante_url } = body as Record<string, string>;
+        const whatsapp = String(body.whatsapp || "").trim();
+        const descripcion = String(body.descripcion || "").trim();
+        const monto = Number(body.monto) || 0;
+        const tipo = String(body.tipo || "pago").trim();
+        const categoria = String(body.categoria || "Otros").trim();
+        const fecha_vencimiento = body.fecha_vencimiento ? String(body.fecha_vencimiento) : null;
 
         if (!whatsapp || !descripcion || !monto) {
-            return NextResponse.json(
-                { error: "Faltan campos requeridos: whatsapp, descripcion y monto son obligatorios." },
-                { status: 400 }
-            );
+            return NextResponse.json({
+                error: "Campos requeridos faltando",
+                recibido: { whatsapp, descripcion, monto }
+            }, { status: 400 });
         }
 
-        const supabase = createClient(
-            process.env.NEXT_PUBLIC_SUPABASE_URL!,
-            process.env.SUPABASE_SERVICE_ROLE_KEY!
-        );
+        // Create Supabase Admin client (bypasses RLS)
+        const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+        const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
-        // 2. Look up profile by WhatsApp number
+        if (!supabaseUrl || !serviceKey) {
+            return NextResponse.json({
+                error: "Configuración del servidor incompleta",
+                diagnostico: {
+                    supabase_url: !!supabaseUrl,
+                    service_key: !!serviceKey
+                }
+            }, { status: 500 });
+        }
+
+        const supabase = createClient(supabaseUrl, serviceKey);
+
+        // 1. Buscar perfil por WhatsApp
         const { data: perfil, error: perfilError } = await supabase
             .from("perfiles")
             .select("id, familia_id")
@@ -51,40 +63,44 @@ export async function POST(req: NextRequest) {
             .single();
 
         if (perfilError || !perfil) {
-            return NextResponse.json({ 
-                error: "Usuario no encontrado para este número de WhatsApp",
+            return NextResponse.json({
+                error: "Usuario no encontrado",
                 diagnostico: {
                     whatsapp_buscado: whatsapp,
-                    whatsapp_tipo: typeof whatsapp,
-                    whatsapp_length: whatsapp?.length,
-                    service_role_loaded: !!process.env.SUPABASE_SERVICE_ROLE_KEY,
-                    supabase_url_loaded: !!process.env.NEXT_PUBLIC_SUPABASE_URL,
-                    supabase_error: perfilError?.message || "perfil is null"
+                    supabase_error: perfilError?.message || "sin perfil",
+                    supabase_code: perfilError?.code || "N/A"
                 }
             }, { status: 404 });
         }
 
-        // 3. Create transaction
-        const result = await createTransaccionInternal({
-            descripcion,
-            monto: Number(monto),
-            tipo: tipo || "pago",
-            categoria: categoria || "Otros",
-            estado: estado || "pendiente",
-            user_id: perfil.id,
-            familia_id: perfil.familia_id,
-            fecha_vencimiento: fecha_vencimiento || null,
-            comprobante_url: comprobante_url || null
-        });
+        // 2. Insertar transacción directamente (sin RLS)
+        const { error: insertError } = await supabase
+            .from("transacciones")
+            .insert({
+                descripcion,
+                monto,
+                tipo,
+                categoria,
+                estado: "pendiente",
+                user_id: perfil.id,
+                familia_id: perfil.familia_id,
+                fecha_vencimiento
+            });
 
-        if (result.error) {
-            return NextResponse.json({ error: result.error }, { status: 500 });
+        if (insertError) {
+            return NextResponse.json({
+                error: "Error al insertar transacción",
+                diagnostico: { mensaje: insertError.message, code: insertError.code }
+            }, { status: 500 });
         }
 
-        return NextResponse.json({ success: true, message: "¡Transacción registrada exitosamente!" });
+        return NextResponse.json({
+            success: true,
+            message: "¡Transacción registrada exitosamente!"
+        });
 
-    } catch (error) {
-        console.error("Error en Webhook:", error);
-        return NextResponse.json({ error: "Error interno del servidor" }, { status: 500 });
+    } catch (error: unknown) {
+        const msg = error instanceof Error ? error.message : "Error desconocido";
+        return NextResponse.json({ error: "Error interno", diagnostico: msg }, { status: 500 });
     }
 }
