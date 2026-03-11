@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { createClient } from "@/lib/supabase/server";
+import { createClient } from "@supabase/supabase-js";
 import { createTransaccionInternal } from "@/app/dashboard/transacciones/actions";
 
 export const dynamic = "force-dynamic";
@@ -38,7 +38,10 @@ export async function POST(req: NextRequest) {
             );
         }
 
-        const supabase = await createClient();
+        const supabase = createClient(
+            process.env.NEXT_PUBLIC_SUPABASE_URL!,
+            process.env.SUPABASE_SERVICE_ROLE_KEY!
+        );
 
         // 2. Look up profile by WhatsApp number
         const { data: perfil, error: perfilError } = await supabase
