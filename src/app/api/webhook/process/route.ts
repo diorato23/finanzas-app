@@ -6,12 +6,8 @@ export async function POST(req: NextRequest) {
     const authHeader = req.headers.get("authorization");
     const secret = process.env.N8N_WEBHOOK_SECRET;
 
-    console.log("[WEBHOOK AUTH DEBUG] Header recebido:", authHeader);
-    console.log("[WEBHOOK AUTH DEBUG] Secret do Servidor:", secret);
-
     // 1. Validar Secret
     if (!secret || authHeader !== `Bearer ${secret}`) {
-        console.error("[WEBHOOK AUTH ERROR] Falha de validação! authHeader !== `Bearer ${secret}`");
         return NextResponse.json({ error: "No autorizado" }, { status: 401 });
     }
 
