@@ -34,7 +34,7 @@ export async function POST(req: NextRequest) {
 // DEFINIR / ACTUALIZAR PRESUPUESTO
 // ──────────────────────────────────────
 async function definirPresupuesto(
-    supabase: ReturnType<typeof import("@supabase/supabase-js").createClient>,
+    supabase: any,
     perfil: { id: string; familia_id: string; rol: string },
     body: Record<string, unknown>
 ) {
@@ -83,7 +83,7 @@ async function definirPresupuesto(
 // CONSULTAR PRESUPUESTOS
 // ──────────────────────────────────────
 async function consultarPresupuesto(
-    supabase: ReturnType<typeof import("@supabase/supabase-js").createClient>,
+    supabase: any,
     perfil: { id: string; familia_id: string },
     body: Record<string, unknown>
 ) {

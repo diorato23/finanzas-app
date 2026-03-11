@@ -36,7 +36,7 @@ export async function POST(req: NextRequest) {
 // LISTAR
 // ──────────────────────────────────────
 async function listarCategorias(
-    supabase: ReturnType<typeof import("@supabase/supabase-js").createClient>,
+    supabase: any,
     perfil: { id: string; familia_id: string }
 ) {
     const { data, error } = await supabase
@@ -60,7 +60,7 @@ async function listarCategorias(
 // CREAR
 // ──────────────────────────────────────
 async function crearCategoria(
-    supabase: ReturnType<typeof import("@supabase/supabase-js").createClient>,
+    supabase: any,
     perfil: { id: string; familia_id: string; rol: string },
     body: Record<string, unknown>
 ) {
@@ -91,7 +91,7 @@ async function crearCategoria(
 // ELIMINAR
 // ──────────────────────────────────────
 async function eliminarCategoria(
-    supabase: ReturnType<typeof import("@supabase/supabase-js").createClient>,
+    supabase: any,
     perfil: { id: string; familia_id: string; rol: string },
     body: Record<string, unknown>
 ) {

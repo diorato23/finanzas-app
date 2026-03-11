@@ -36,7 +36,7 @@ export async function POST(req: NextRequest) {
 // RESUMEN DEL MES ACTUAL
 // ──────────────────────────────────────
 async function resumenMes(
-    supabase: ReturnType<typeof import("@supabase/supabase-js").createClient>,
+    supabase: any,
     perfil: { id: string; familia_id: string }
 ) {
     const now = new Date();
@@ -88,7 +88,7 @@ async function resumenMes(
 // RESUMEN POR PERÍODO
 // ──────────────────────────────────────
 async function resumenPeriodo(
-    supabase: ReturnType<typeof import("@supabase/supabase-js").createClient>,
+    supabase: any,
     perfil: { id: string; familia_id: string },
     body: Record<string, unknown>
 ) {
@@ -139,7 +139,7 @@ async function resumenPeriodo(
 // GASTOS POR CATEGORÍA
 // ──────────────────────────────────────
 async function porCategoria(
-    supabase: ReturnType<typeof import("@supabase/supabase-js").createClient>,
+    supabase: any,
     perfil: { id: string; familia_id: string },
     body: Record<string, unknown>
 ) {

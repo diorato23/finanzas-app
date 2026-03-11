@@ -38,7 +38,7 @@ export async function POST(req: NextRequest) {
 // CREAR
 // ──────────────────────────────────────
 async function crearTransaccion(
-    supabase: ReturnType<typeof import("@supabase/supabase-js").createClient>,
+    supabase: any,
     perfil: { id: string; familia_id: string },
     body: Record<string, unknown>
 ) {
@@ -80,7 +80,7 @@ async function crearTransaccion(
 // LISTAR
 // ──────────────────────────────────────
 async function listarTransacciones(
-    supabase: ReturnType<typeof import("@supabase/supabase-js").createClient>,
+    supabase: any,
     perfil: { id: string; familia_id: string },
     body: Record<string, unknown>
 ) {
@@ -118,7 +118,7 @@ async function listarTransacciones(
 // ELIMINAR
 // ──────────────────────────────────────
 async function eliminarTransaccion(
-    supabase: ReturnType<typeof import("@supabase/supabase-js").createClient>,
+    supabase: any,
     perfil: { id: string; familia_id: string },
     body: Record<string, unknown>
 ) {
@@ -159,7 +159,7 @@ async function eliminarTransaccion(
 // EDITAR
 // ──────────────────────────────────────
 async function editarTransaccion(
-    supabase: ReturnType<typeof import("@supabase/supabase-js").createClient>,
+    supabase: any,
     perfil: { id: string; familia_id: string },
     body: Record<string, unknown>
 ) {
