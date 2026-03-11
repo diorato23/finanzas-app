@@ -46,7 +46,7 @@ export default async function DashboardPage() {
                     <Button asChild className="w-full sm:w-auto bg-primary hover:bg-primary/90 text-white rounded-full shadow-lg transition-all hover:scale-105 active:scale-95">
                         <Link href="/dashboard/transacciones/nueva">
                             <PlusIcon className="w-4 h-4 mr-2" />
-                            Nueva Transação
+                            Nueva Transacción
                         </Link>
                     </Button>
                 </div>

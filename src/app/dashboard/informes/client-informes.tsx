@@ -27,7 +27,7 @@ export type CategoriaData = {
     nombre: string
 }
 
-export function RelatorioClient({ categories }: { categories: CategoriaData[] }) {
+export function InformeClient({ categories }: { categories: CategoriaData[] }) {
     const [mounted, setMounted] = useState(false)
     const [chartData, setChartData] = useState<InformeData[] | null>(null)
     const [isPending, setIsPending] = useState(false)

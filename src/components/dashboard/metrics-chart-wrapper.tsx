@@ -4,14 +4,14 @@ import { MetricsChart } from "./metrics-chart"
 export async function MetricsChartWrapper() {
     const supabase = await createClient()
 
-    // Buscar dados dos últimos 6 meses para o gráfico
-    // Como simplificação para este app, vamos agrupar por mês as transações já existentes
+    // Buscar datos de los últimos 6 meses para el gráfico
+    // Como simplificación para este app, vamos a agrupar por mes las transacciones ya existentes
     const { data: transacciones } = await supabase
         .from("transacciones")
         .select("monto, tipo, created_at")
         .order("created_at", { ascending: true })
 
-    // Processar dados para o formato do Recharts
+    // Procesar datos para el formato de Recharts
     const monthsMap: Record<string, { ingresos: number, gastos: number }> = {}
 
     const monthNames = ["Ene", "Feb", "Mar", "Abr", "May", "Jun", "Jul", "Ago", "Sep", "Oct", "Nov", "Dic"]

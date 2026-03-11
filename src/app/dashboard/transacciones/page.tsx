@@ -13,7 +13,7 @@ export default async function TransaccionesPage() {
         .select("*, perfiles(nombre)")
         .order("created_at", { ascending: false })
 
-    // Carregar categorias dinâmicas do banco
+    // Cargar categorías dinámicas del banco
     const { data: categoriasRows } = await supabase
         .from("categorias")
         .select("nombre")
@@ -26,7 +26,7 @@ export default async function TransaccionesPage() {
         storedCatNames = categoriasRows.map(c => c.nombre)
     }
 
-    // Mescla as bases nativas da plataforma + as criadas pelo usuário (removendo duplicações)
+    // Mezcla las bases nativas de la plataforma + las creadas por el usuario (eliminando duplicados)
     const categoriasDisponibles = Array.from(new Set([...baseCategories, ...storedCatNames]))
 
     if (error) {

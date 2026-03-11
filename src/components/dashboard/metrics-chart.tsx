@@ -18,7 +18,7 @@ export function MetricsChart({ data }: MetricsChartProps) {
                 <div className="space-y-1">
                     <CardTitle className="text-xl font-bold tracking-tight">Flujo de Caja</CardTitle>
                     <CardDescription className="text-muted-foreground font-medium">
-                        Comparativa de ingresos y gastos (últimos mesa)
+                        Comparativa de ingresos y gastos (últimos meses)
                     </CardDescription>
                 </div>
             </CardHeader>
@@ -41,14 +41,14 @@ export function MetricsChart({ data }: MetricsChartProps) {
                                 vertical={false}
                                 stroke="currentColor"
                                 className="opacity-[0.05]"
-                            />
+                             />
                             <XAxis
                                 dataKey="date"
                                 stroke="#888888"
                                 fontSize={12}
                                 tickLine={false}
                                 axisLine={false}
-                                tickFormatter={(value) => value.split(' ')[0]} // Apenas o mês
+                                tickFormatter={(value) => value.split(' ')[0]} // Solo el mes
                                 dy={10}
                             />
                             <YAxis

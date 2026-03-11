@@ -25,7 +25,7 @@ export function EmptyState({ onAction, actionHref }: EmptyStateProps) {
         </Button>
       ) : (
         <Button onClick={onAction} className="bg-emerald-600 hover:bg-emerald-700 text-white">
-          Registrar mi primer movimento
+          Registrar mi primer movimiento
         </Button>
       )}
     </div>

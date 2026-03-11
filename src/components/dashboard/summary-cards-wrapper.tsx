@@ -39,7 +39,7 @@ export async function SummaryCardsWrapper() {
                 amount={saldoActual}
                 icon={WalletIcon}
                 variant="default"
-                description="Efetivo actual disponível"
+                description="Efectivo actual disponible"
             />
             <SummaryCard
                 title="Ingresos"

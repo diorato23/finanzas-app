@@ -85,14 +85,14 @@ export default async function PresupuestosPage({ searchParams }: { searchParams:
         <div className="space-y-6 max-w-5xl mx-auto pb-20 md:pb-6">
             <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
                 <div>
-                    <h2 className="text-3xl font-bold tracking-tight text-foreground">Orçamentos</h2>
+                    <h2 className="text-3xl font-bold tracking-tight text-foreground">Presupuestos</h2>
                     <p className="text-muted-foreground mt-1">
-                        Gerencia os limites de gastos da sua família. Selecione um mês para visualizar.
+                        Administra los límites de gastos de tu familia. Selecciona un mes para visualizar.
                     </p>
                 </div>
 
                 <form className="flex items-center gap-2 max-w-xs w-full" method="get">
-                    <Label htmlFor="mes_anio" className="sr-only">Mês</Label>
+                    <Label htmlFor="mes_anio" className="sr-only">Mes</Label>
                     <Input
                         id="mes_anio"
                         name="mes_anio"
@@ -108,20 +108,20 @@ export default async function PresupuestosPage({ searchParams }: { searchParams:
                 <div className="bg-amber-50 dark:bg-amber-900/20 text-amber-600 dark:text-amber-400 p-4 rounded-xl border border-amber-200 dark:border-amber-800 flex items-start gap-3">
                     <AlertCircle className="w-5 h-5 mt-0.5 shrink-0" />
                     <div className="text-sm font-medium">
-                        O banco de dados ainda não possui a tabela de orçamentos. Peça para o Desenvolvedor aplicar a migração `20260225044500_add_presupuestos_table.sql` com URGÊNCIA.
+                        La base de datos aún no cuenta con la tabla de presupuestos. Pide al Desarrollador aplicar la migración `20260225044500_add_presupuestos_table.sql` con URGÊNCIA.
                     </div>
                 </div>
             )}
 
             <div className="grid gap-6 md:grid-cols-3">
 
-                {/* Lista de Orçamentos (Cartões Grandes) */}
+                {/* Lista de Presupuestos (Tarjetas Grandes) */}
                 <div className="md:col-span-2 space-y-4">
                     {orcamentosSeguros.length === 0 && !presErr ? (
                         <div className="text-center p-12 bg-card rounded-[20px] border border-border/50 shadow-sm">
                             <TrendingDown className="w-12 h-12 text-muted-foreground/30 mx-auto mb-3" />
-                            <h3 className="text-lg font-medium text-foreground">Sem orçamentos neste mês</h3>
-                            <p className="text-muted-foreground text-sm mt-1">Crie um novo limite para começar a acompanhar seus gastos.</p>
+                            <h3 className="text-lg font-medium text-foreground">Sin presupuestos en este mes</h3>
+                            <p className="text-muted-foreground text-sm mt-1">Crea un nuevo límite para comenzar a monitorear tus gastos.</p>
                         </div>
                     ) : (
                         orcamentosSeguros.map((pres) => {
