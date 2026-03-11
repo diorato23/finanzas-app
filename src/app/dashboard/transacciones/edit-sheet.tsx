@@ -207,6 +207,8 @@ export function EditTransactionSheet({
                                                     field.onChange(formatted)
                                                 }}
                                                 inputMode="numeric"
+                                                pattern="[0-9]*"
+                                                className="text-2xl font-bold h-14"
                                             />
                                         </FormControl>
                                         <FormMessage />
