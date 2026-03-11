@@ -5,9 +5,18 @@ services:
       dockerfile: Dockerfile
     container_name: finanzas-app
     restart: always
-    ports:
-      - "3000:3000"
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.bolsillo_app.rule=Host(`bolsillo.ktuche.com`)"
+      - "traefik.http.routers.bolsillo_app.entrypoints=websecure"
+      - "traefik.http.routers.bolsillo_app.tls.certresolver=mytlschallenge"
+      - "traefik.http.services.bolsillo_app.loadbalancer.server.port=3000"
     env_file:
       - .env
     environment:
       - NODE_ENV=production
+    networks:
+      - n8n_default
+networks:
+  n8n_default:
+    external: true
