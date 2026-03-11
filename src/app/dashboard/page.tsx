@@ -8,6 +8,7 @@ import { RecentMovementsWrapper } from "@/components/dashboard/recent-movements-
 import { MetricsChartWrapper } from "@/components/dashboard/metrics-chart-wrapper"
 import { BiometricActivation } from "@/components/auth/biometric-activation"
 import { Skeleton } from "@/components/ui/skeleton"
+import { SafeDate } from "@/components/ui/safe-date"
 
 function SummaryCardsSkeleton() {
     return (
@@ -35,9 +36,11 @@ export default async function DashboardPage() {
                     <h2 className="text-2xl sm:text-3xl font-bold tracking-tight text-foreground">
                         Resumen Financiero
                     </h2>
-                    <p className="text-sm font-medium text-muted-foreground mt-1">
-                        Mes actual: {now.toLocaleDateString('es-CO', { month: 'long', year: 'numeric' })}
-                    </p>
+                    <SafeDate>
+                        <p className="text-sm font-medium text-muted-foreground mt-1">
+                            Mes actual: {now.toLocaleDateString('es-CO', { month: 'long', year: 'numeric' })}
+                        </p>
+                    </SafeDate>
                 </div>
                 <div className="flex gap-2 w-full sm:w-auto">
                     <Button asChild className="w-full sm:w-auto bg-primary hover:bg-primary/90 text-white rounded-full shadow-lg transition-all hover:scale-105 active:scale-95">

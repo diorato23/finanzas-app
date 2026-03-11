@@ -12,6 +12,7 @@ import { useTransition } from "react"
 import { toast } from "sonner"
 import { EmptyState } from "@/components/ui/empty-state"
 import { useRouter } from "next/navigation"
+import { SafeDate } from "@/components/ui/safe-date"
 
 function formatCOP(amount: number) {
     return new Intl.NumberFormat("es-CO", {
@@ -95,14 +96,16 @@ export function ClientTable({ transacciones, categoriasDisponibles }: ClientTabl
                                     className="group border-b transition-colors hover:bg-accent/30 data-[state=selected]:bg-muted"
                                 >
                                     <TableCell>
-                                        <div className="text-sm font-medium">
-                                            {new Intl.DateTimeFormat('es-CO', { day: '2-digit', month: 'short' }).format(new Date(t.created_at))}
-                                        </div>
-                                        {t.fecha_vencimiento && (
-                                            <div className="text-xs text-muted-foreground mt-0.5">
-                                                Vence: {new Intl.DateTimeFormat('es-CO', { day: '2-digit', month: '2-digit', year: 'numeric' }).format(new Date(t.fecha_vencimiento))}
+                                        <SafeDate>
+                                            <div className="text-sm font-medium">
+                                                {new Intl.DateTimeFormat('es-CO', { day: '2-digit', month: 'short' }).format(new Date(t.created_at))}
                                             </div>
-                                        )}
+                                            {t.fecha_vencimiento && (
+                                                <div className="text-xs text-muted-foreground mt-0.5">
+                                                    Vence: {new Intl.DateTimeFormat('es-CO', { day: '2-digit', month: '2-digit', year: 'numeric' }).format(new Date(t.fecha_vencimiento))}
+                                                </div>
+                                            )}
+                                        </SafeDate>
                                     </TableCell>
                                     <TableCell className="font-medium">
                                         {t.descripcion}
