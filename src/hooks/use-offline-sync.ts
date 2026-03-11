@@ -26,15 +26,15 @@ export function useOfflineSync() {
         if (res.success) {
           // Se sincronizou com sucesso, limpa o banco local
           await db.pendingTransactions.clear();
-          toast.success(`Sincronizados ${res.count} itens offline! 🔄`, {
-            description: "Seus dados agora estão na nuvem."
+          toast.success(`¡Sincronizados ${res.count} ítems offline! 🔄`, {
+            description: "Tus datos ahora están en la nube."
           });
           router.refresh();
         } else {
-          console.error("Erro na sincronização:", res.error);
+          console.error("Error en la sincronización:", res.error);
         }
       } catch (error) {
-        console.error("Falha ao sincronizar:", error);
+        console.error("Falla al sincronizar:", error);
       } finally {
         setIsSyncing(false);
       }

@@ -65,7 +65,7 @@ export async function signup(formData: FormData) {
     })
 
     if (loginError) {
-        const msg = encodeURIComponent("Login Pós-Registro: " + loginError.message)
+        const msg = encodeURIComponent("Login después del registro: " + loginError.message)
         redirect(`/login?error=${msg}`)
     }
 

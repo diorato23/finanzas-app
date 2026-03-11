@@ -113,7 +113,7 @@ export default function NuevaTransaccionClient({ categoriasDisponibles }: { cate
                 const suggestion = await suggestCategory(descripcion, categoriasDisponibles)
                 if (suggestion) {
                     form.setValue("categoria", suggestion, { shouldValidate: true })
-                    toast.success(`IA sugeriu: ${suggestion}`, {
+                    toast.success(`IA sugirió: ${suggestion}`, {
                         icon: <SparklesIcon className="h-4 w-4 text-primary" />,
                         duration: 2000
                     })
@@ -144,13 +144,13 @@ export default function NuevaTransaccionClient({ categoriasDisponibles }: { cate
                         fecha_vencimiento: values.fecha_vencimiento || null,
                         created_at: new Date().toISOString(),
                     })
-                    toast.success("Salvo localmente (Offline) 📶", {
-                        description: "Sincronizaremos quando você tiver internet.",
+                    toast.success("Guardado localmente (Offline) 📶", {
+                        description: "Sincronizaremos cuando tengas internet.",
                         duration: 5000
                     })
                     form.reset()
                 } catch (err) {
-                    toast.error("Erro ao salvar offline")
+                    toast.error("Error al guardar offline")
                     console.error(err)
                 }
             })
@@ -192,7 +192,7 @@ export default function NuevaTransaccionClient({ categoriasDisponibles }: { cate
                 <CardHeader className="pb-3 border-b border-indigo-100/50 bg-indigo-50">
                     <CardTitle className="text-lg flex items-center gap-2 text-indigo-700">
                         <SparklesIcon className="h-5 w-5" />
-                        Botão Mágico (IA)
+                        Botón Mágico (IA)
                     </CardTitle>
                     <CardDescription className="text-indigo-600/80">
                         Pega aquí el SMS o texto de Nequi, Daviplata, Bancolombia...

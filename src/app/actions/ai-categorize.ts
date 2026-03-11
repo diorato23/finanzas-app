@@ -14,14 +14,14 @@ export async function suggestCategory(description: string, categories: string[])
     try {
         const { text } = await generateText({
             model: google('gemini-1.5-flash'), // Performance balanceada para latência baixa na VPS
-            system: `Você é um assistente financeiro especializado em categorização de gastos para um App de Finanças Pessoal.
-               Suas opções de categorias são estritamente estas: ${categories.join(', ')}.
-               Regras:
-               1. Responda APENAS com o nome exato da categoria.
-               2. Não use pontuação, explicações ou frases adicionais.
-               3. Se houver ambiguidade, escolha a mais óbvia.
-               4. Se não encontrar nenhuma relação, responda "Outros" ou a categoria equivalente na lista.`,
-            prompt: `Em qual categoria se encaixa o gasto: "${description}"?`,
+            system: `Eres un asistente financiero especializado en categorización de gastos para un App de Finanzas Personal.
+               Tus opciones de categorías son estrictamente estas: ${categories.join(', ')}.
+               Reglas:
+               1. Responde ÚNICAMENTE con el nombre exacto de la categoría.
+               2. No uses puntuación, explicaciones o frases adicionales.
+               3. Si hay ambigüedad, elige la más obvia.
+               4. Si no encuentras ninguna relación, responde "Otros" o la categoría equivalente en la lista.`,
+            prompt: `¿En qué categoría encaja el gasto: "${description}"?`,
         });
 
         const suggestion = text.trim();
