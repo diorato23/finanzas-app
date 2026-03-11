@@ -3,15 +3,25 @@
 import { useEffect, useState, useTransition } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet"
 import { editTransaccion } from "./actions"
 import { toast } from "sonner"
-import { EditIcon } from "lucide-react"
+import { EditIcon, SparklesIcon } from "lucide-react"
 import { getCategoryWithEmoji } from "@/lib/utils"
 import { suggestCategory } from "@/app/actions/ai-categorize"
-import { SparklesIcon } from "lucide-react"
+
+import { useForm } from "react-hook-form"
+import { zodResolver } from "@hookform/resolvers/zod"
+import * as z from "zod"
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form"
 
 const formatToCurrencyInput = (value: string | number) => {
     const stringVal = String(value)
@@ -25,6 +35,16 @@ const unformatCurrency = (formatted: string) => {
     return formatted.replace(/\D/g, "")
 }
 
+const formSchema = z.object({
+  id: z.string(),
+  tipo: z.enum(["pago", "cobro"]),
+  montoVisual: z.string().min(1, "Campo requerido"),
+  descripcion: z.string().min(1, "Campo requerido"),
+  categoria: z.string().min(1, "Campo requerido"),
+  estado: z.enum(["pendiente", "pagado", "recibido"]),
+  fecha_vencimiento: z.string().optional(),
+})
+
 export function EditTransactionSheet({
     transaccion,
     categoriasDisponibles
@@ -36,27 +56,38 @@ export function EditTransactionSheet({
     const [open, setOpen] = useState(false)
     const [isPending, startTransition] = useTransition()
     const [errorInfo, setErrorInfo] = useState<any>(null)
-    const [montoVisual, setMontoVisual] = useState(formatToCurrencyInput(transaccion.monto))
-    const [description, setDescription] = useState(transaccion.descripcion)
-    const [categoria, setCategoria] = useState(transaccion.categoria || categoriasDisponibles[0])
     const [isAiLoading, setIsAiLoading] = useState(false)
+
+    const defaultDate = transaccion.fecha_vencimiento
+        ? new Date(transaccion.fecha_vencimiento).toISOString().split('T')[0]
+        : ""
+
+    const form = useForm<z.infer<typeof formSchema>>({
+        resolver: zodResolver(formSchema),
+        defaultValues: {
+            id: transaccion.id,
+            tipo: transaccion.tipo || "pago",
+            montoVisual: formatToCurrencyInput(transaccion.monto),
+            descripcion: transaccion.descripcion || "",
+            categoria: transaccion.categoria || categoriasDisponibles[0] || "",
+            estado: transaccion.estado || "pendiente",
+            fecha_vencimiento: defaultDate,
+        },
+    })
+
+    const descripcion = form.watch("descripcion")
 
     useEffect(() => {
         setMounted(true)
     }, [])
 
-    const handleMontoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const val = e.target.value
-        setMontoVisual(formatToCurrencyInput(val))
-    }
-
     const handleAiSuggestion = async () => {
-        if (description.length > 3) {
+        if (descripcion && descripcion.length > 3) {
             setIsAiLoading(true)
             try {
-                const suggestion = await suggestCategory(description, categoriasDisponibles)
+                const suggestion = await suggestCategory(descripcion, categoriasDisponibles)
                 if (suggestion) {
-                    setCategoria(suggestion)
+                    form.setValue("categoria", suggestion, { shouldValidate: true })
                     toast.success(`IA sugeriu: ${suggestion}`, {
                         icon: <SparklesIcon className="h-4 w-4 text-primary" />,
                         duration: 2000
@@ -70,34 +101,46 @@ export function EditTransactionSheet({
         }
     }
 
-    const handleSubmit = (formData: FormData) => {
-        formData.append("id", transaccion.id)
-        formData.set("monto", unformatCurrency(montoVisual))
+    const onSubmit = (values: z.infer<typeof formSchema>) => {
+        const formData = new FormData()
+        formData.append("id", values.id)
+        formData.append("tipo", values.tipo)
+        formData.append("monto", unformatCurrency(values.montoVisual))
+        formData.append("descripcion", values.descripcion)
+        formData.append("categoria", values.categoria)
+        formData.append("estado", values.estado)
+        if (values.fecha_vencimiento) {
+            formData.append("fecha_vencimiento", values.fecha_vencimiento)
+        }
 
         setErrorInfo(null)
 
-        const promise = () => new Promise(async (resolve, reject) => {
+        startTransition(async () => {
             const res = await editTransaccion(formData)
             if (res?.error) {
                 setErrorInfo(res)
-                reject(res.error)
+                toast.error(res.error || 'Error ao actualizar')
             } else {
+                toast.success('¡Transacción actualizada!')
                 setOpen(false)
-                resolve(res)
             }
-        })
-
-        toast.promise(promise(), {
-            loading: 'Actualizando transacción...',
-            success: '¡Transacción actualizada!',
-            error: (err) => err || 'Error ao actualizar',
         })
     }
 
-    // Garante que o input date esteja no formato YYYY-MM-DD
-    const defaultDate = transaccion.fecha_vencimiento
-        ? new Date(transaccion.fecha_vencimiento).toISOString().split('T')[0]
-        : ""
+    // Update form when sheet opens with new transaccion data
+    useEffect(() => {
+        if (open) {
+            form.reset({
+                id: transaccion.id,
+                tipo: transaccion.tipo || "pago",
+                montoVisual: formatToCurrencyInput(transaccion.monto),
+                descripcion: transaccion.descripcion || "",
+                categoria: transaccion.categoria || categoriasDisponibles[0] || "",
+                estado: transaccion.estado || "pendiente",
+                fecha_vencimiento: defaultDate,
+            })
+        }
+    }, [open, transaccion, categoriasDisponibles, defaultDate, form])
 
     if (!mounted) {
         return (
@@ -124,101 +167,155 @@ export function EditTransactionSheet({
                     </SheetDescription>
                 </SheetHeader>
 
-                <form action={handleSubmit} className="space-y-4">
-                    <div className="grid grid-cols-2 gap-4">
-                        <div className="space-y-2">
-                            <Label htmlFor="tipo">Tipo</Label>
-                            <Select name="tipo" required defaultValue={transaccion.tipo}>
-                                <SelectTrigger id="tipo">
-                                    <SelectValue placeholder="Seleccionar..." />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    <SelectItem value="pago">Gasto (A Pagar)</SelectItem>
-                                    <SelectItem value="cobro">Ingreso (A Cobrar)</SelectItem>
-                                </SelectContent>
-                            </Select>
-                        </div>
-
-                        <div className="space-y-2">
-                            <Label htmlFor="monto">Monto (COP)</Label>
-                            <Input
-                                type="text"
-                                inputMode="numeric"
-                                id="montoVisual"
-                                name="montoVisual"
-                                placeholder="Ej: 15.000"
-                                required
-                                value={montoVisual}
-                                onChange={handleMontoChange}
+                <Form {...form}>
+                    <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+                        <div className="grid grid-cols-2 gap-4">
+                            <FormField
+                                control={form.control}
+                                name="tipo"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel>Tipo</FormLabel>
+                                        <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                            <FormControl>
+                                                <SelectTrigger>
+                                                    <SelectValue placeholder="Seleccionar..." />
+                                                </SelectTrigger>
+                                            </FormControl>
+                                            <SelectContent>
+                                                <SelectItem value="pago">Gasto (A Pagar)</SelectItem>
+                                                <SelectItem value="cobro">Ingreso (A Cobrar)</SelectItem>
+                                            </SelectContent>
+                                        </Select>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
                             />
-                            <input type="hidden" name="monto" value={unformatCurrency(montoVisual)} />
-                        </div>
-                    </div>
 
-                    <div className="space-y-2">
-                        <Label htmlFor="descripcion">Descripción</Label>
-                        <Input
-                            type="text"
-                            id="descripcion"
+                            <FormField
+                                control={form.control}
+                                name="montoVisual"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel>Monto (COP)</FormLabel>
+                                        <FormControl>
+                                            <Input
+                                                placeholder="Ej: 15.000"
+                                                {...field}
+                                                onChange={(e) => {
+                                                    const formatted = formatToCurrencyInput(e.target.value)
+                                                    field.onChange(formatted)
+                                                }}
+                                                inputMode="numeric"
+                                            />
+                                        </FormControl>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+                        </div>
+
+                        <FormField
+                            control={form.control}
                             name="descripcion"
-                            value={description}
-                            onChange={(e) => setDescription(e.target.value)}
-                            onBlur={handleAiSuggestion}
-                            required
-                            className={isAiLoading ? "animate-pulse border-primary/50" : ""}
+                            render={({ field }) => (
+                                <FormItem className="space-y-2">
+                                    <FormLabel>Descripción</FormLabel>
+                                    <FormControl>
+                                        <Input
+                                            placeholder="Alquiler, Mercado, Salario..."
+                                            {...field}
+                                            onBlur={() => {
+                                                field.onBlur()
+                                                handleAiSuggestion()
+                                            }}
+                                            className={isAiLoading ? "animate-pulse border-primary/50" : ""}
+                                        />
+                                    </FormControl>
+                                    {isAiLoading && <p className="text-[10px] text-primary font-medium animate-pulse">IA pensando...</p>}
+                                    <FormMessage />
+                                </FormItem>
+                            )}
                         />
-                        {isAiLoading && <p className="text-[10px] text-primary animate-pulse font-medium">IA pensando...</p>}
-                    </div>
 
-                    <div className="grid grid-cols-2 gap-4">
-                        <div className="space-y-2">
-                            <Label htmlFor="categoria">Categoría</Label>
-                            <Select name="categoria" required value={categoria} onValueChange={setCategoria}>
-                                <SelectTrigger id="categoria">
-                                    <SelectValue placeholder="Seleccionar..." />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    {categoriasDisponibles.map((cat, idx) => (
-                                        <SelectItem key={idx} value={cat}>{getCategoryWithEmoji(cat)}</SelectItem>
-                                    ))}
-                                </SelectContent>
-                            </Select>
+                        <div className="grid grid-cols-2 gap-4">
+                            <FormField
+                                control={form.control}
+                                name="categoria"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel>Categoría</FormLabel>
+                                        <Select onValueChange={field.onChange} value={field.value}>
+                                            <FormControl>
+                                                <SelectTrigger>
+                                                    <SelectValue placeholder="Seleccionar..." />
+                                                </SelectTrigger>
+                                            </FormControl>
+                                            <SelectContent>
+                                                {categoriasDisponibles.map((cat, idx) => (
+                                                    <SelectItem key={idx} value={cat}>{getCategoryWithEmoji(cat)}</SelectItem>
+                                                ))}
+                                            </SelectContent>
+                                        </Select>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+
+                            <FormField
+                                control={form.control}
+                                name="estado"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel>Estado Actual</FormLabel>
+                                        <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                            <FormControl>
+                                                <SelectTrigger>
+                                                    <SelectValue placeholder="Seleccionar..." />
+                                                </SelectTrigger>
+                                            </FormControl>
+                                            <SelectContent>
+                                                <SelectItem value="pendiente">Pendiente</SelectItem>
+                                                <SelectItem value="pagado">Pagado</SelectItem>
+                                                <SelectItem value="recibido">Recibido (Ingreso)</SelectItem>
+                                            </SelectContent>
+                                        </Select>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
                         </div>
 
-                        <div className="space-y-2">
-                            <Label htmlFor="estado">Estado Actual</Label>
-                            <Select name="estado" required defaultValue={transaccion.estado}>
-                                <SelectTrigger id="estado">
-                                    <SelectValue placeholder="Seleccionar..." />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    <SelectItem value="pendiente">Pendiente</SelectItem>
-                                    <SelectItem value="pagado">Pagado</SelectItem>
-                                    <SelectItem value="recibido">Recibido (Ingreso)</SelectItem>
-                                </SelectContent>
-                            </Select>
+                        <FormField
+                            control={form.control}
+                            name="fecha_vencimiento"
+                            render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel>Fecha de Vencimiento / Pago</FormLabel>
+                                    <FormControl>
+                                        <Input type="date" {...field} />
+                                    </FormControl>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+
+                        {errorInfo?.error && (
+                            <div className="p-3 bg-red-50 text-red-600 rounded text-sm mb-4 mt-2">
+                                <p className="font-semibold">{errorInfo.error}</p>
+                                {errorInfo.details && <p>{JSON.stringify(errorInfo.details)}</p>}
+                            </div>
+                        )}
+
+                        <div className="mt-6">
+                            <Button type="submit" disabled={isPending} className="w-full bg-indigo-600 hover:bg-indigo-700 text-white">
+                                {isPending ? "Guardando..." : "Guardar Cambios"}
+                            </Button>
                         </div>
-                    </div>
-
-                    <div className="space-y-2">
-                        <Label htmlFor="fecha_vencimiento">Fecha de Vencimiento / Pago</Label>
-                        <Input type="date" id="fecha_vencimiento" name="fecha_vencimiento" defaultValue={defaultDate} />
-                    </div>
-
-                    {errorInfo?.error && (
-                        <div className="p-3 bg-red-50 text-red-600 rounded text-sm mt-4">
-                            <p className="font-semibold">{errorInfo.error}</p>
-                            {errorInfo.details && <p>{JSON.stringify(errorInfo.details)}</p>}
-                        </div>
-                    )}
-
-                    <div className="mt-6">
-                        <Button type="submit" disabled={isPending} className="w-full bg-indigo-600 hover:bg-indigo-700 text-white">
-                            {isPending ? "Guardando..." : "Guardar Cambios"}
-                        </Button>
-                    </div>
-                </form>
+                    </form>
+                </Form>
             </SheetContent>
         </Sheet>
     )
 }
+
