@@ -33,8 +33,10 @@ export async function updateSession(request: NextRequest) {
 
     // Protect all non-public routes here
     const isAuthRoute = request.nextUrl.pathname.startsWith('/login') || request.nextUrl.pathname.startsWith('/register')
-    if (!user && !isAuthRoute && request.nextUrl.pathname !== '/') {
-        // If no user and trying to access protected route
+    const isApiRoute = request.nextUrl.pathname.startsWith('/api')
+    
+    if (!user && !isAuthRoute && !isApiRoute && request.nextUrl.pathname !== '/') {
+        // If no user and trying to access protected route and it is not an API route
         const url = request.nextUrl.clone()
         url.pathname = '/login'
         return NextResponse.redirect(url)
