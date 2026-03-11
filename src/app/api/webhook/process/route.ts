@@ -4,39 +4,43 @@ import { createTransaccionInternal } from "@/app/dashboard/transacciones/actions
 
 export const dynamic = "force-dynamic";
 
-export async function POST(req: NextRequest) {
-    const authHeader = req.headers.get("authorization")?.trim() || "vazio";
-    
-    // O Docker frequentemente injeta aspas ("") ou espaços invisíveis no final das variáveis no .env
-    // Isso limpa a string para garantir uma comparação de texto justa
-    const rawSecret = process.env.N8N_WEBHOOK_SECRET;
-    const cleanSecret = rawSecret?.replace(/['"]/g, '')?.trim();
+// Detects body format automatically: works with JSON and form-encoded (n8n keypair mode)
+async function parseBody(req: NextRequest): Promise<Record<string, unknown>> {
+    const contentType = req.headers.get("content-type") || "";
+    if (contentType.includes("application/x-www-form-urlencoded")) {
+        const text = await req.text();
+        const params = new URLSearchParams(text);
+        return Object.fromEntries(params.entries());
+    }
+    return await req.json();
+}
 
-    // 1. Validar Secret
+export async function POST(req: NextRequest) {
+    const authHeader = req.headers.get("authorization")?.trim() || "";
+
+    // Strips accidental quotes or trailing spaces injected by Docker .env
+    const rawSecret = process.env.N8N_WEBHOOK_SECRET;
+    const cleanSecret = rawSecret?.replace(/['"]/g, "")?.trim();
+
+    // 1. Validate Secret
     if (!cleanSecret || authHeader !== `Bearer ${cleanSecret}`) {
-        return NextResponse.json({ 
-            error: "No autorizado",
-            diagnostico: {
-                header_recebido: authHeader,
-                servidor_tem_senha: !!rawSecret,
-                senha_tamanho_real: rawSecret?.length || 0,
-                senha_tamanho_limpa: cleanSecret?.length || 0
-            }
-        }, { status: 401 });
+        return NextResponse.json({ error: "No autorizado" }, { status: 401 });
     }
 
     try {
-        const body = await req.json();
-        const { whatsapp, descripcion, monto, tipo, categoria, estado, fecha_vencimiento, comprobante_url } = body;
+        const body = await parseBody(req);
+        const { whatsapp, descripcion, monto, tipo, categoria, estado, fecha_vencimiento, comprobante_url } = body as Record<string, string>;
 
         if (!whatsapp || !descripcion || !monto) {
-            return NextResponse.json({ error: "Dados incompletos (whatsapp, descripcion, monto são obrigatórios)" }, { status: 400 });
+            return NextResponse.json(
+                { error: "Faltan campos requeridos: whatsapp, descripcion y monto son obligatorios." },
+                { status: 400 }
+            );
         }
 
         const supabase = await createClient();
 
-        // 2. Buscar Perfil pelo WhatsApp
-        // O número deve vir no formato string puro (ex: "5511999999999")
+        // 2. Look up profile by WhatsApp number
         const { data: perfil, error: perfilError } = await supabase
             .from("perfiles")
             .select("id, familia_id")
@@ -44,16 +48,15 @@ export async function POST(req: NextRequest) {
             .single();
 
         if (perfilError || !perfil) {
-            console.error("Perfil não encontrado para o WhatsApp:", whatsapp);
-            return NextResponse.json({ error: "Usuário não encontrado para este número de WhatsApp" }, { status: 404 });
+            return NextResponse.json({ error: "Usuario no encontrado para este número de WhatsApp" }, { status: 404 });
         }
 
-        // 3. Criar Transação
+        // 3. Create transaction
         const result = await createTransaccionInternal({
             descripcion,
             monto: Number(monto),
             tipo: tipo || "pago",
-            categoria: categoria || "Outros",
+            categoria: categoria || "Otros",
             estado: estado || "pendiente",
             user_id: perfil.id,
             familia_id: perfil.familia_id,
@@ -65,10 +68,10 @@ export async function POST(req: NextRequest) {
             return NextResponse.json({ error: result.error }, { status: 500 });
         }
 
-        return NextResponse.json({ success: true, message: "Transação criada com sucesso!" });
+        return NextResponse.json({ success: true, message: "¡Transacción registrada exitosamente!" });
 
     } catch (error) {
-        console.error("Erro no Webhook:", error);
-        return NextResponse.json({ error: "Erro interno no servidor" }, { status: 500 });
+        console.error("Error en Webhook:", error);
+        return NextResponse.json({ error: "Error interno del servidor" }, { status: 500 });
     }
 }
