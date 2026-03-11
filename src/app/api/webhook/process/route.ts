@@ -3,12 +3,24 @@ import { createClient } from "@/lib/supabase/server";
 import { createTransaccionInternal } from "@/app/dashboard/transacciones/actions";
 
 export async function POST(req: NextRequest) {
-    const authHeader = req.headers.get("authorization");
-    const secret = process.env.N8N_WEBHOOK_SECRET;
+    const authHeader = req.headers.get("authorization")?.trim() || "vazio";
+    
+    // O Docker frequentemente injeta aspas ("") ou espaços invisíveis no final das variáveis no .env
+    // Isso limpa a string para garantir uma comparação de texto justa
+    const rawSecret = process.env.N8N_WEBHOOK_SECRET;
+    const cleanSecret = rawSecret?.replace(/['"]/g, '')?.trim();
 
     // 1. Validar Secret
-    if (!secret || authHeader !== `Bearer ${secret}`) {
-        return NextResponse.json({ error: "No autorizado" }, { status: 401 });
+    if (!cleanSecret || authHeader !== `Bearer ${cleanSecret}`) {
+        return NextResponse.json({ 
+            error: "No autorizado",
+            diagnostico: {
+                header_recebido: authHeader,
+                servidor_tem_senha: !!rawSecret,
+                senha_tamanho_real: rawSecret?.length || 0,
+                senha_tamanho_limpa: cleanSecret?.length || 0
+            }
+        }, { status: 401 });
     }
 
     try {
