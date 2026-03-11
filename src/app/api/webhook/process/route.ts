@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { createTransaccionInternal } from "@/app/dashboard/transacciones/actions";
 
+export const dynamic = "force-dynamic";
+
 export async function POST(req: NextRequest) {
     const authHeader = req.headers.get("authorization")?.trim() || "vazio";
     
