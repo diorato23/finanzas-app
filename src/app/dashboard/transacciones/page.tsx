@@ -3,7 +3,6 @@ import { Card, CardHeader, CardTitle } from "@/components/ui/card"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { PlusIcon } from "lucide-react"
-import { EditTransactionSheet } from "./edit-sheet"
 import { ClientTable } from "./client-table"
 
 export default async function TransaccionesPage() {

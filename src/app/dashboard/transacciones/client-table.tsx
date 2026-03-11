@@ -10,6 +10,8 @@ import { getCategoryWithEmoji } from "@/lib/utils"
 import { updateTransaccionEstado, deleteTransaccion } from "./actions"
 import { useTransition } from "react"
 import { toast } from "sonner"
+import { EmptyState } from "@/components/ui/empty-state"
+import { useRouter } from "next/navigation"
 
 function formatCOP(amount: number) {
     return new Intl.NumberFormat("es-CO", {
@@ -26,6 +28,7 @@ interface ClientTableProps {
 
 export function ClientTable({ transacciones, categoriasDisponibles }: ClientTableProps) {
     const [isPending, startTransition] = useTransition()
+    const router = useRouter()
 
     const handleUpdateEstado = async (id: string, nuevoEstado: string) => {
         startTransition(async () => {
@@ -48,6 +51,14 @@ export function ClientTable({ transacciones, categoriasDisponibles }: ClientTabl
                 toast.success("Transacción eliminada")
             }
         })
+    }
+
+    if (transacciones.length === 0) {
+        return (
+            <div className="p-8">
+                <EmptyState onAction={() => router.push("/dashboard/transacciones/nueva")} />
+            </div>
+        )
     }
 
     return (
@@ -146,13 +157,6 @@ export function ClientTable({ transacciones, categoriasDisponibles }: ClientTabl
                             )
                         })}
                     </AnimatePresence>
-                    {transacciones.length === 0 && (
-                        <TableRow>
-                            <TableCell colSpan={7} className="h-32 text-center text-muted-foreground">
-                                Ninguna transacción registrada todavía.
-                            </TableCell>
-                        </TableRow>
-                    )}
                 </TableBody>
             </Table>
         </div>
