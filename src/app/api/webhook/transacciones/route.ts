@@ -37,6 +37,9 @@ export async function POST(req: NextRequest) {
 // ──────────────────────────────────────
 // CREAR
 // ──────────────────────────────────────
+// ──────────────────────────────────────
+// CREAR
+// ──────────────────────────────────────
 async function crearTransaccion(
     supabase: any,
     perfil: { id: string; familia_id: string },
@@ -50,7 +53,7 @@ async function crearTransaccion(
 
     if (!descripcion || !monto) {
         return NextResponse.json(
-            { error: "Campos 'descripcion' y 'monto' son obligatorios" },
+            { error: "Campos 'descripcion' y 'monto' son obligatorios." },
             { status: 400 }
         );
     }
@@ -67,15 +70,20 @@ async function crearTransaccion(
     });
 
     if (error) {
-        return NextResponse.json({ error: "Error al crear transacción", detalle: error.message }, { status: 500 });
+        return NextResponse.json({ error: "Error al registrar transacción", detalle: error.message }, { status: 500 });
     }
+
+    const tipoEmoji = tipo === "cobro" ? "📈" : "📉";
 
     return NextResponse.json({
         success: true,
-        message: `✅ Transacción registrada: ${descripcion} por $${monto.toLocaleString("es-CO")}`
+        message: `${tipoEmoji} *¡Listo!* He registrado tu transacción:\n\n*${descripcion}*\n💰 *Valor:* $${monto.toLocaleString("es-CO")}\n📂 *Categoría:* ${categoria}`
     });
 }
 
+// ──────────────────────────────────────
+// LISTAR
+// ──────────────────────────────────────
 // ──────────────────────────────────────
 // LISTAR
 // ──────────────────────────────────────
@@ -97,23 +105,31 @@ async function listarTransacciones(
         return NextResponse.json({ error: "Error al listar", detalle: error.message }, { status: 500 });
     }
 
-    const transacciones = (data || []).map(t => ({
-        id: t.id,
-        descripcion: t.descripcion,
-        monto: `$${Number(t.monto).toLocaleString("es-CO")}`,
-        tipo: t.tipo === "cobro" ? "📈 Ingreso" : "📉 Gasto",
-        categoria: t.categoria,
-        estado: t.estado,
-        fecha: t.fecha_vencimiento || t.created_at?.split("T")[0]
-    }));
+    if (!data || data.length === 0) {
+        return NextResponse.json({
+            success: true,
+            message: "📭 No encontré transacciones recientes."
+        });
+    }
+
+    let message = "📝 *Tus últimas transacciones:*\n\n";
+    data.forEach(t => {
+        const emoji = t.tipo === "cobro" ? "📈" : "📉";
+        const monto = Number(t.monto).toLocaleString("es-CO");
+        message += `${emoji} *${t.descripcion}*\n💰 $${monto} | 📂 ${t.categoria}\n🆔 \`${t.id}\`\n\n`;
+    });
 
     return NextResponse.json({
         success: true,
-        total: transacciones.length,
-        transacciones
+        total: data.length,
+        message: message.trim(),
+        transacciones: data
     });
 }
 
+// ──────────────────────────────────────
+// ELIMINAR
+// ──────────────────────────────────────
 // ──────────────────────────────────────
 // ELIMINAR
 // ──────────────────────────────────────
@@ -125,19 +141,18 @@ async function eliminarTransaccion(
     const transaccion_id = String(body.transaccion_id || "").trim();
 
     if (!transaccion_id) {
-        return NextResponse.json({ error: "Campo 'transaccion_id' es obligatorio" }, { status: 400 });
+        return NextResponse.json({ error: "El campo 'transaccion_id' es obligatorio." }, { status: 400 });
     }
 
-    // Verify transaction belongs to user's family
-    const { data: existing } = await supabase
+    const { data: existing, error: findError } = await supabase
         .from("transacciones")
         .select("id, descripcion, monto")
         .eq("id", transaccion_id)
         .eq("familia_id", perfil.familia_id)
-        .single();
+        .maybeSingle();
 
-    if (!existing) {
-        return NextResponse.json({ error: "Transacción no encontrada" }, { status: 404 });
+    if (findError || !existing) {
+        return NextResponse.json({ error: "Transacción no encontrada o no tienes permisos." }, { status: 404 });
     }
 
     const { error } = await supabase
@@ -146,15 +161,18 @@ async function eliminarTransaccion(
         .eq("id", transaccion_id);
 
     if (error) {
-        return NextResponse.json({ error: "Error al eliminar", detalle: error.message }, { status: 500 });
+        return NextResponse.json({ error: "Error al eliminar la transacción", detalle: error.message }, { status: 500 });
     }
 
     return NextResponse.json({
         success: true,
-        message: `🗑️ Eliminada: "${existing.descripcion}" ($${Number(existing.monto).toLocaleString("es-CO")})`
+        message: `🗑️ *He eliminado la transacción:* "${existing.descripcion}" de $${Number(existing.monto).toLocaleString("es-CO")}.`
     });
 }
 
+// ──────────────────────────────────────
+// EDITAR
+// ──────────────────────────────────────
 // ──────────────────────────────────────
 // EDITAR
 // ──────────────────────────────────────
@@ -166,32 +184,33 @@ async function editarTransaccion(
     const transaccion_id = String(body.transaccion_id || "").trim();
 
     if (!transaccion_id) {
-        return NextResponse.json({ error: "Campo 'transaccion_id' es obligatorio" }, { status: 400 });
+        return NextResponse.json({ error: "El campo 'transaccion_id' es obligatorio." }, { status: 400 });
     }
 
-    // Verify transaction belongs to user's family
-    const { data: existing } = await supabase
+    const { data: existing, error: findError } = await supabase
         .from("transacciones")
-        .select("id")
+        .select("id, descripcion, monto")
         .eq("id", transaccion_id)
         .eq("familia_id", perfil.familia_id)
-        .single();
+        .maybeSingle();
 
-    if (!existing) {
-        return NextResponse.json({ error: "Transacción no encontrada" }, { status: 404 });
+    if (findError || !existing) {
+        return NextResponse.json({ error: "Transacción no encontrada o no tienes permisos." }, { status: 404 });
     }
 
-    // Build update object with only provided fields
     const updates: Record<string, unknown> = {};
     if (body.descripcion) updates.descripcion = String(body.descripcion).trim();
     if (body.monto) updates.monto = Number(body.monto);
-    if (body.tipo) updates.tipo = String(body.tipo).trim();
+    if (body.tipo) {
+        const t = String(body.tipo).trim().toLowerCase();
+        updates.tipo = t === "ingreso" || t === "cobro" ? "cobro" : "pago";
+    }
     if (body.categoria) updates.categoria = String(body.categoria).trim();
     if (body.estado) updates.estado = String(body.estado).trim();
     if (body.fecha_vencimiento) updates.fecha_vencimiento = String(body.fecha_vencimiento);
 
     if (Object.keys(updates).length === 0) {
-        return NextResponse.json({ error: "No hay campos para actualizar" }, { status: 400 });
+        return NextResponse.json({ error: "No hay campos para actualizar." }, { status: 400 });
     }
 
     const { error } = await supabase
@@ -200,12 +219,12 @@ async function editarTransaccion(
         .eq("id", transaccion_id);
 
     if (error) {
-        return NextResponse.json({ error: "Error al editar", detalle: error.message }, { status: 500 });
+        return NextResponse.json({ error: "Error al editar la transacción", detalle: error.message }, { status: 500 });
     }
 
     return NextResponse.json({
         success: true,
-        message: `✏️ Transacción actualizada correctamente`,
+        message: `✏️ *He actualizado la transacción:* "${updates.descripcion || existing.descripcion}".`,
         campos_modificados: Object.keys(updates)
     });
 }
