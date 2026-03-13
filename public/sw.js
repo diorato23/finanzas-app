@@ -42,6 +42,11 @@ self.addEventListener('fetch', (event) => {
         return;
     }
 
+    // A API de Cache suporta apenas requisições GET
+    if (request.method !== 'GET') {
+        return;
+    }
+
     // Ignora requisições de API para o Supabase e arquivos de dados do Next.js (esses exigem rede)
     if (url.pathname.startsWith('/api/') || url.pathname.startsWith('/_next/data/')) {
         event.respondWith(
