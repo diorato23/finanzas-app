@@ -91,6 +91,11 @@ export default function LoginPage({ searchParams }: { searchParams: Promise<{ er
                                 <Input id="email-signup" name="email" type="email" placeholder="correo@ejemplo.com" required />
                             </div>
                             <div className="space-y-2">
+                                <Label htmlFor="whatsapp">WhatsApp (Para el Bot)</Label>
+                                <Input id="whatsapp" name="whatsapp" type="tel" placeholder="Ej: 573001234567" required />
+                                <p className="text-[0.8rem] text-muted-foreground">Incluye el código de país sin el '+'.</p>
+                            </div>
+                            <div className="space-y-2">
                                 <Label htmlFor="password-signup">Contraseña</Label>
                                 <Input id="password-signup" name="password" type="password" required />
                             </div>

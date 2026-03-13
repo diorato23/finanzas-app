@@ -29,6 +29,7 @@ export async function signup(formData: FormData) {
     const nombre = formData.get("nombre") as string
     const familiaNombre = formData.get("familia") as string // Si existe, es titular
     const codigoFamilia = formData.get("codigo_familia") as string // Si existe, es dependiente
+    const whatsapp = formData.get("whatsapp") as string // Opcional o requerido según UI
 
     const supabase = await createClient()
 
@@ -95,7 +96,8 @@ export async function signup(formData: FormData) {
             id: authData.user.id,
             familia_id: finalFamiliaId,
             rol: rol,
-            nombre: nombre
+            nombre: nombre,
+            whatsapp: whatsapp || null
         }])
 
     if (perfError) {
