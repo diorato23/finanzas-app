@@ -9,6 +9,11 @@ import { google } from '@ai-sdk/google';
  * Retorna o nome da categoria mais provável.
  */
 export async function suggestCategory(description: string, categories: string[]) {
+    if (!process.env.GOOGLE_GENERATIVE_AI_API_KEY) {
+        console.warn("Falta configurar GOOGLE_GENERATIVE_AI_API_KEY para suggerir categoría.");
+        return null;
+    }
+
     if (!description || description.length < 3) return null;
 
     try {
