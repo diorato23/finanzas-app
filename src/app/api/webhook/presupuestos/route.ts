@@ -22,9 +22,13 @@ export async function POST(req: NextRequest) {
             case "consultar":
             case "get":
                 return await consultarPresupuesto(supabase, perfil, body);
+            case "eliminar":
+            case "delete":
+            case "remove":
+                return await eliminarPresupuesto(supabase, perfil, body);
             default:
                 return NextResponse.json(
-                    { error: `Acción '${action}' no válida. Usa: definir (set), consultar (get)` },
+                    { error: `Acción '${action}' no válida. Usa: definir (set), consultar (get), eliminar (delete)` },
                     { status: 400 }
                 );
         }
@@ -147,5 +151,42 @@ async function consultarPresupuesto(
         success: true,
         periodo: mesAnio,
         presupuestos: resultado
+    });
+}
+
+// ──────────────────────────────────────
+// ELIMINAR PRESUPUESTO
+// ──────────────────────────────────────
+async function eliminarPresupuesto(
+    supabase: any,
+    perfil: { id: string; familia_id: string; rol: string },
+    body: Record<string, unknown>
+) {
+    if (perfil.rol !== "admin" && perfil.rol !== "co_admin") {
+        return NextResponse.json({ error: "Solo administradores pueden eliminar presupuestos" }, { status: 403 });
+    }
+
+    const categoria = String(body.categoria || "").trim();
+    const now = new Date();
+    const mesAnio = String(body.mes_anio || `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`).trim();
+
+    if (!categoria) {
+        return NextResponse.json({ error: "Campo 'categoria' é obrigatório" }, { status: 400 });
+    }
+
+    const { error } = await supabase
+        .from("presupuestos")
+        .delete()
+        .eq("familia_id", perfil.familia_id)
+        .eq("categoria", categoria)
+        .eq("mes_anio", mesAnio);
+
+    if (error) {
+        return NextResponse.json({ error: "Error al eliminar presupuesto", detalle: error.message }, { status: 500 });
+    }
+
+    return NextResponse.json({
+        success: true,
+        message: `🗑️ Presupuesto de ${categoria} eliminado para ${mesAnio}`
     });
 }
