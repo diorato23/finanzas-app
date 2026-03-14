@@ -118,7 +118,7 @@ async function listarTransacciones(
     }
 
     let message = "📝 *Tus últimas transacciones:*\n\n";
-    data.forEach(t => {
+    data.forEach((t: any) => {
         const emoji = t.tipo === "cobro" ? "📈" : "📉";
         const monto = Number(t.monto).toLocaleString("es-CO");
         message += `${emoji} *${t.descripcion}*\n💰 $${monto} | 📂 ${t.categoria}\n🆔 \`${t.id}\`\n\n`;
