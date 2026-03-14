@@ -15,12 +15,14 @@ export async function POST(req: NextRequest) {
 
         switch (action) {
             case "definir":
+            case "set":
                 return await definirPresupuesto(supabase, perfil, body);
             case "consultar":
+            case "get":
                 return await consultarPresupuesto(supabase, perfil, body);
             default:
                 return NextResponse.json(
-                    { error: `Acción '${action}' no válida. Usa: definir, consultar` },
+                    { error: `Acción '${action}' no válida. Usa: definir (set), consultar (get)` },
                     { status: 400 }
                 );
         }
@@ -117,14 +119,14 @@ async function consultarPresupuesto(
         .lte("created_at", ultimoDia + "T23:59:59");
 
     const gastosPorCat: Record<string, number> = {};
-    (transacciones || []).forEach(t => {
+    (transacciones || []).forEach((t: any) => {
         const cat = t.categoria || "Otros";
         gastosPorCat[cat] = (gastosPorCat[cat] || 0) + Number(t.monto);
     });
 
     const fmt = (n: number) => `$${n.toLocaleString("es-CO")}`;
 
-    const resultado = presupuestos.map(p => {
+    const resultado = presupuestos.map((p: any) => {
         const gastado = gastosPorCat[p.categoria] || 0;
         const restante = p.monto_limite - gastado;
         const porcentaje = Math.round((gastado / p.monto_limite) * 100);

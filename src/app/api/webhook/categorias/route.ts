@@ -15,14 +15,17 @@ export async function POST(req: NextRequest) {
 
         switch (action) {
             case "listar":
+            case "list":
                 return await listarCategorias(supabase, perfil);
             case "crear":
+            case "create":
                 return await crearCategoria(supabase, perfil, body);
             case "eliminar":
+            case "delete":
                 return await eliminarCategoria(supabase, perfil, body);
             default:
                 return NextResponse.json(
-                    { error: `Acción '${action}' no válida. Usa: listar, crear, eliminar` },
+                    { error: `Acción '${action}' no válida. Usa: listar (list), crear (create), eliminar (delete)` },
                     { status: 400 }
                 );
         }
@@ -52,7 +55,7 @@ async function listarCategorias(
     return NextResponse.json({
         success: true,
         total: (data || []).length,
-        categorias: (data || []).map(c => ({ id: c.id, nombre: c.nombre }))
+        categorias: (data || []).map((c: any) => ({ id: c.id, nombre: c.nombre }))
     });
 }
 
