@@ -87,15 +87,15 @@ export default async function SubscriptionPage() {
                                 <CreditCard size={16} /> Medios de Pago Disponibles:
                             </h3>
                             <div className="flex gap-2 justify-center">
-                                <span className="bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400 text-xs font-bold px-3 py-1.5 rounded-md flex items-center gap-1">
+                                <a href={wpLink} target="_blank" rel="noopener noreferrer" className="bg-purple-100 hover:bg-purple-200 text-purple-700 dark:bg-purple-900/30 dark:hover:bg-purple-900/50 dark:text-purple-400 text-xs font-bold px-3 py-1.5 rounded-md flex items-center gap-1 transition-colors cursor-pointer">
                                     <Smartphone size={14} /> Nequi
-                                </span>
-                                <span className="bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-500 text-xs font-bold px-3 py-1.5 rounded-md flex items-center gap-1">
+                                </a>
+                                <a href={wpLink} target="_blank" rel="noopener noreferrer" className="bg-yellow-100 hover:bg-yellow-200 text-yellow-800 dark:bg-yellow-900/30 dark:hover:bg-yellow-900/50 dark:text-yellow-500 text-xs font-bold px-3 py-1.5 rounded-md flex items-center gap-1 transition-colors cursor-pointer">
                                     <Smartphone size={14} /> Bancolombia
-                                </span>
-                                <span className="bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-500 text-xs font-bold px-3 py-1.5 rounded-md flex items-center gap-1">
+                                </a>
+                                <a href={wpLink} target="_blank" rel="noopener noreferrer" className="bg-red-100 hover:bg-red-200 text-red-800 dark:bg-red-900/30 dark:hover:bg-red-900/50 dark:text-red-500 text-xs font-bold px-3 py-1.5 rounded-md flex items-center gap-1 transition-colors cursor-pointer">
                                     <Smartphone size={14} /> DaviPlata
-                                </span>
+                                </a>
                             </div>
                         </div>
                     </CardContent>
