@@ -90,9 +90,9 @@ export async function signup(formData: FormData) {
 
     // 4. Create Perfil
     const rol = familiaNombre ? 'admin' : 'dependiente'
-    // Trial period calculation (5 minutes for testing)
+    // Trial period calculation (1 day for testing)
     const now = new Date();
-    const trialEndsAt = new Date(now.getTime() + 5 * 60000).toISOString();
+    const trialEndsAt = new Date(now.getTime() + 24 * 60 * 60000).toISOString();
 
     const { error: perfError } = await supabase
         .from('perfiles')

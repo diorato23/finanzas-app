@@ -25,7 +25,8 @@ export default async function DashboardLayout({
         .single()
 
     if (!perfil) {
-        return <div className="p-8 text-center text-muted-foreground">Cargando perfil...</div>
+        console.error(">>> [DASHBOARD] Perfil não encontrado para o usuário:", user.id)
+        redirect("/login")
     }
 
     // Trial Check Logic
