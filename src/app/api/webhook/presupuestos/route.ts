@@ -16,6 +16,8 @@ export async function POST(req: NextRequest) {
         switch (action) {
             case "definir":
             case "set":
+            case "editar":
+            case "update":
                 return await definirPresupuesto(supabase, perfil, body);
             case "consultar":
             case "get":
