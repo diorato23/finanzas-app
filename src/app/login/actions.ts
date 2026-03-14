@@ -90,6 +90,10 @@ export async function signup(formData: FormData) {
 
     // 4. Create Perfil
     const rol = familiaNombre ? 'admin' : 'dependiente'
+    // Trial period calculation (5 minutes for testing)
+    const now = new Date();
+    const trialEndsAt = new Date(now.getTime() + 5 * 60000).toISOString();
+
     const { error: perfError } = await supabase
         .from('perfiles')
         .insert([{
@@ -97,7 +101,9 @@ export async function signup(formData: FormData) {
             familia_id: finalFamiliaId,
             rol: rol,
             nombre: nombre,
-            whatsapp: whatsapp || null
+            whatsapp: whatsapp || null,
+            subscription_status: 'trial',
+            trial_ends_at: trialEndsAt
         }])
 
     if (perfError) {

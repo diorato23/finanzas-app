@@ -40,7 +40,7 @@ export async function authenticateWebhook(req: NextRequest, body: Record<string,
 
     const { data: perfil, error: perfilError } = await supabase
         .from("perfiles")
-        .select("id, familia_id, rol")
+        .select("id, familia_id, rol, subscription_status, trial_ends_at")
         .eq("whatsapp", whatsapp)
         .single();
 
@@ -51,7 +51,31 @@ export async function authenticateWebhook(req: NextRequest, body: Record<string,
         };
     }
 
-    return { ok: true, supabase, perfil, whatsapp };
+    if (perfil.subscription_status === 'trial' && perfil.trial_ends_at) {
+        const now = new Date();
+        const trialEnds = new Date(perfil.trial_ends_at);
+        if (now > trialEnds) {
+            return {
+                ok: false,
+                response: NextResponse.json({
+                    success: true, // success = true para que o n8n formate como mensagem normal do bot
+                    message: "🔒 *¡Tu período de prueba ha terminado!*\n\nEsperamos que hayas disfrutado de Finanzas App. Para seguir registrando gastos y conversando conmigo, por favor adquiere o renueva tu suscripción desde la aplicación.\n\nAccede aquí: https://bolsillo.ktuche.com"
+                })
+            };
+        }
+    }
+
+    // Explicitly enforce that we return only the fields defined in the type
+    return { 
+        ok: true, 
+        supabase, 
+        perfil: {
+            id: perfil.id,
+            familia_id: perfil.familia_id,
+            rol: perfil.rol
+        }, 
+        whatsapp 
+    };
 }
 
 /**

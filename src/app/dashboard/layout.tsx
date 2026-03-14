@@ -28,6 +28,15 @@ export default async function DashboardLayout({
         return <div className="p-8 text-center text-muted-foreground">Cargando perfil...</div>
     }
 
+    // Trial Check Logic
+    if (perfil.subscription_status === 'trial' && perfil.trial_ends_at) {
+        const now = new Date();
+        const trialEnds = new Date(perfil.trial_ends_at);
+        if (now > trialEnds) {
+            redirect("/subscription")
+        }
+    }
+
     const isAdmin = perfil.rol === "admin" || perfil.rol === "co_admin"
     const hasFamily = !!perfil.familias
 
