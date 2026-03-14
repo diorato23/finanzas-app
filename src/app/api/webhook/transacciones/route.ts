@@ -15,12 +15,17 @@ export async function POST(req: NextRequest) {
 
         switch (action) {
             case "crear":
+            case "create":
                 return await crearTransaccion(supabase, perfil, body);
             case "listar":
+            case "list":
                 return await listarTransacciones(supabase, perfil, body);
             case "eliminar":
+            case "delete":
                 return await eliminarTransaccion(supabase, perfil, body);
             case "editar":
+            case "edit":
+            case "update":
                 return await editarTransaccion(supabase, perfil, body);
             default:
                 return NextResponse.json(
