@@ -3,10 +3,12 @@ import "./globals.css"
 import { ThemeProvider } from "@/components/theme-provider"
 import { ServiceWorkerRegister } from "@/components/pwa-register"
 import { Toaster } from "sonner"
-
 import { Metadata, Viewport } from "next"
 
-const outfit = Outfit({ subsets: ["latin"], variable: "--font-sans" })
+const outfit = Outfit({ 
+  subsets: ["latin"], 
+  variable: "--font-outfit" 
+})
 
 export const viewport: Viewport = {
   themeColor: "#09090b",
@@ -30,16 +32,6 @@ export const metadata: Metadata = {
     apple: "/icons/apple-touch-icon.png",
   },
 }
-
-import { OfflineSyncProvider } from "@/components/offline-sync-provider"
-
-import { Outfit } from "next/font/google"
-import { ThemeProvider } from "@/components/theme-provider"
-
-const outfit = Outfit({
-  subsets: ["latin"],
-  variable: "--font-outfit",
-})
 
 export default function RootLayout({
   children,
