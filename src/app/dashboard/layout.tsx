@@ -48,17 +48,35 @@ export default async function DashboardLayout({
         const hasFamily = !!safePerfil.familias
 
         return (
-            <div className="p-8">
-                <h1 className="text-2xl font-bold">Modo de Diagnóstico V2</h1>
-                <p>Usuário ID: {user?.id}</p>
-                <div className="mt-4 p-4 border rounded bg-card">
-                    <h2 className="font-bold">Dados do Perfil:</h2>
-                    <pre className="text-xs overflow-auto">{JSON.stringify(safePerfil, null, 2)}</pre>
+            <SidebarProvider>
+                <AppSidebar />
+
+                <div className="flex flex-1 flex-col min-h-screen min-w-0 bg-background overflow-hidden relative pb-[72px] md:pb-0">
+                    {/* Header Superior */}
+                    <header className="print:hidden flex items-center justify-between px-4 sm:px-8 py-4 bg-card border-b border-border/50 shrink-0 h-[70px]">
+                        <div className="flex items-center gap-3">
+                            <SidebarTrigger className="md:hidden" />
+                            <h1 className="text-xl font-bold tracking-tight text-foreground">
+                                ¡Hola, {safePerfil?.nombre?.split(' ')[0] || 'Usuário'}!
+                            </h1>
+                        </div>
+
+                        <div className="flex items-center gap-2 text-muted-foreground">
+                            <HeaderThemeToggle />
+                        </div>
+                    </header>
+
+                    {/* Área de rolagem principal */}
+                    <main className="flex-1 overflow-y-auto w-full">
+                        {children}
+                    </main>
+
+                    {/* Navbar Inferior (Apenas Mobile) */}
+                    <div className="print:hidden">
+                        <AppBottomNav isAdmin={isAdmin} hasFamily={hasFamily} />
+                    </div>
                 </div>
-                <main className="mt-8 border-t pt-8">
-                    {children}
-                </main>
-            </div>
+            </SidebarProvider>
         )
     } catch (error: any) {
         return (

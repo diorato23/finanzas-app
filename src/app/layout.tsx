@@ -33,15 +33,30 @@ export const metadata: Metadata = {
 
 import { OfflineSyncProvider } from "@/components/offline-sync-provider"
 
+import { Outfit } from "next/font/google"
+import { ThemeProvider } from "@/components/theme-provider"
+
+const outfit = Outfit({
+  subsets: ["latin"],
+  variable: "--font-outfit",
+})
+
 export default function RootLayout({
   children,
 }: {
   children: React.ReactNode
 }) {
   return (
-    <html lang="es">
-      <body style={{ margin: 0, padding: 0, minHeight: '100vh', background: '#fff' }}>
-        {children}
+    <html lang="es" className={`${outfit.variable} font-sans`} suppressHydrationWarning>
+      <body className="min-h-screen bg-background text-foreground antialiased selection:bg-primary selection:text-white">
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="system"
+          enableSystem
+          disableTransitionOnChange
+        >
+          {children}
+        </ThemeProvider>
       </body>
     </html>
   )
