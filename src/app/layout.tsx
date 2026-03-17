@@ -1,4 +1,3 @@
-"use strict"
 import { Outfit } from "next/font/google"
 import "./globals.css"
 import { ThemeProvider } from "@/components/theme-provider"
@@ -40,26 +39,9 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="es" className={`${outfit.variable} font-sans`} suppressHydrationWarning>
-      <body className="min-h-screen bg-background text-foreground antialiased selection:bg-primary selection:text-white">
-        <ThemeProvider
-          attribute="class"
-          defaultTheme="system"
-          enableSystem
-          disableTransitionOnChange
-        >
-          <ServiceWorkerRegister />
-          <OfflineSyncProvider>
-            {children}
-          </OfflineSyncProvider>
-          <Toaster
-            richColors
-            closeButton
-            position="bottom-center"
-            duration={3000}
-            offset={80}
-          />
-        </ThemeProvider>
+    <html lang="es">
+      <body style={{ margin: 0, padding: 0, minHeight: '100vh', background: '#fff' }}>
+        {children}
       </body>
     </html>
   )

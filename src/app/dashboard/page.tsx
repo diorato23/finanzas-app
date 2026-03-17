@@ -52,7 +52,7 @@ export default async function DashboardPage() {
                 </div>
             </div>
 
-            <BiometricActivation />
+{/* <BiometricActivation /> */}
 
             {/* DASHBOARD STREAMING SECTION */}
             <Suspense fallback={<SummaryCardsSkeleton />}>

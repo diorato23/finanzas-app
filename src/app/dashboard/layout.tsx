@@ -11,65 +11,61 @@ export default async function DashboardLayout({
 }: {
     children: React.ReactNode
 }) {
-    const supabase = await createClient()
-    const { data: { user } } = await supabase.auth.getUser()
+    try {
+        const supabase = await createClient()
+        const { data: { user }, error: authError } = await supabase.auth.getUser()
 
-    if (!user) {
-        redirect("/login")
-    }
-
-    const { data: perfil } = await supabase
-        .from("perfiles")
-        .select("*, familias(nombre)")
-        .eq("id", user.id)
-        .single()
-
-    if (!perfil) {
-        console.error(">>> [DASHBOARD] Perfil não encontrado para o usuário:", user.id)
-        redirect("/login")
-    }
-
-    // Trial Check Logic
-    if (perfil.subscription_status === 'trial' && perfil.trial_ends_at) {
-        const now = new Date();
-        const trialEnds = new Date(perfil.trial_ends_at);
-        if (now > trialEnds) {
-            redirect("/subscription")
+        if (authError) {
+            return <div className="p-10 bg-red-50 text-red-800">Erro de Autenticação: {authError.message}</div>
         }
-    }
 
-    const isAdmin = perfil.rol === "admin" || perfil.rol === "co_admin"
-    const hasFamily = !!perfil.familias
+        if (!user) {
+            redirect("/login")
+        }
 
-    return (
-        <SidebarProvider>
-            <AppSidebar />
+        let perfil = null
+        try {
+            const { data, error: profileError } = await supabase
+                .from("perfiles")
+                .select("*, familias(nombre)")
+                .eq("id", user.id)
+                .single()
+            
+            if (profileError) console.error("Erro Supabase Perfil:", profileError)
+            perfil = data
+        } catch (e: any) {
+            console.error("Erro ao buscar perfil:", e)
+        }
 
-            <div className="flex flex-1 flex-col min-h-screen min-w-0 bg-background overflow-hidden relative pb-[72px] md:pb-0">
-                {/* Header Superior (Mais limpo) */}
-                <header className="print:hidden flex items-center justify-between px-4 sm:px-8 py-4 bg-card border-b border-border/50 shrink-0 h-[70px]">
-                    <div className="flex items-center gap-3">
-                        <SidebarTrigger className="md:hidden" />
-                        <h1 className="text-xl font-bold tracking-tight text-foreground">
-                            ¡Hola, {perfil.nombre.split(' ')[0]}!
-                        </h1>
-                    </div>
+        const safePerfil = perfil || {
+            nombre: "Usuario Temporario",
+            rol: "dependiente",
+            subscription_status: "active",
+            familias: null
+        }
 
-                    <div className="flex items-center gap-2 text-muted-foreground">
-                        <HeaderThemeToggle />
-                    </div>
-                </header>
+        const isAdmin = safePerfil.rol === "admin" || safePerfil.rol === "co_admin"
+        const hasFamily = !!safePerfil.familias
 
-                {/* Área de rolagem principal */}
-                <main className="flex-1 overflow-y-auto w-full">
+        return (
+            <div className="p-8">
+                <h1 className="text-2xl font-bold">Modo de Diagnóstico V2</h1>
+                <p>Usuário ID: {user?.id}</p>
+                <div className="mt-4 p-4 border rounded bg-card">
+                    <h2 className="font-bold">Dados do Perfil:</h2>
+                    <pre className="text-xs overflow-auto">{JSON.stringify(safePerfil, null, 2)}</pre>
+                </div>
+                <main className="mt-8 border-t pt-8">
                     {children}
                 </main>
-
-                {/* Navbar Inferior (Apenas Mobile) */}
-                <div className="print:hidden">
-                    <AppBottomNav isAdmin={isAdmin} hasFamily={hasFamily} />
-                </div>
             </div>
-        </SidebarProvider>
-    )
+        )
+    } catch (error: any) {
+        return (
+            <div className="p-10 bg-red-100 text-red-900 border-2 border-red-500 rounded-lg m-4">
+                <h1 className="text-xl font-bold mb-2">ERRO FATAL NO LAYOUT</h1>
+                <pre className="whitespace-pre-wrap text-sm">{error.stack || error.message || String(error)}</pre>
+            </div>
+        )
+    }
 }
