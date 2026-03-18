@@ -51,15 +51,32 @@ export async function authenticateWebhook(req: NextRequest, body: Record<string,
         };
     }
 
-    if (perfil.subscription_status === 'trial' && perfil.trial_ends_at) {
+    let currentSubscription = perfil.subscription_status;
+    let currentTrialEndsAt = perfil.trial_ends_at;
+
+    if (perfil.rol !== 'admin' && perfil.familia_id) {
+        const { data: adminPerfil } = await supabase
+            .from("perfiles")
+            .select("subscription_status, trial_ends_at")
+            .eq("familia_id", perfil.familia_id)
+            .eq("rol", "admin")
+            .single();
+            
+        if (adminPerfil) {
+            currentSubscription = adminPerfil.subscription_status;
+            currentTrialEndsAt = adminPerfil.trial_ends_at;
+        }
+    }
+
+    if (currentSubscription === 'trial' && currentTrialEndsAt) {
         const now = new Date();
-        const trialEnds = new Date(perfil.trial_ends_at);
+        const trialEnds = new Date(currentTrialEndsAt);
         if (now > trialEnds) {
             return {
                 ok: false,
                 response: NextResponse.json({
                     success: true, // success = true para que o n8n formate como mensagem normal do bot
-                    message: "🔒 *¡Tu período de prueba ha terminado!*\n\nEsperamos que hayas disfrutado de Finanzas App. Para seguir registrando gastos y conversando conmigo, por favor adquiere o renueva tu suscripción desde la aplicación.\n\nAccede aquí: https://bolsillo.ktuche.com"
+                    message: "🔒 *¡El período de prueba ha terminado!*\n\nEsperamos que hayas disfrutado de Finanzas App. Para seguir registrando gastos, pide al administrador principal de tu grupo familiar que renueve la suscripción o hazlo tú mismo aquí: https://bolsillo.ktuche.com"
                 })
             };
         }

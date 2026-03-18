@@ -15,22 +15,43 @@ export default async function SubscriptionPage() {
 
     const { data: perfil } = await supabase
         .from("perfiles")
-        .select("subscription_status, trial_ends_at, nombre, whatsapp")
+        .select("subscription_status, trial_ends_at, nombre, whatsapp, rol, familia_id")
         .eq("id", user.id)
         .single()
 
+    let activeSubscriptionStatus = perfil?.subscription_status;
+    let activeTrialEndsAt = perfil?.trial_ends_at;
+
+    if (perfil?.rol !== 'admin' && perfil?.familia_id) {
+        const { data: adminPerfil } = await supabase
+            .from("perfiles")
+            .select("subscription_status, trial_ends_at")
+            .eq("familia_id", perfil.familia_id)
+            .eq("rol", "admin")
+            .single();
+            
+        if (adminPerfil) {
+            activeSubscriptionStatus = adminPerfil.subscription_status;
+            activeTrialEndsAt = adminPerfil.trial_ends_at;
+        }
+    }
+
     // Se não estiver em trial expirado ou se já for premium, manda pro dashboard
-    if (perfil?.subscription_status === 'active') {
+    if (activeSubscriptionStatus === 'active') {
         redirect("/dashboard")
     }
 
-    if (perfil?.subscription_status === 'trial' && perfil.trial_ends_at) {
+    if (activeSubscriptionStatus === 'trial' && activeTrialEndsAt) {
         const now = new Date()
-        const trialEnds = new Date(perfil.trial_ends_at)
+        const trialEnds = new Date(activeTrialEndsAt)
         if (now <= trialEnds) {
             redirect("/dashboard")
         }
     }
+
+    const isAdmin = perfil?.rol === 'admin' || perfil?.rol === 'co_admin'; // Treat co_admin closely or just strictly admin for copy.
+    // Wait, the user said the security layer is for the owner. Admin is the owner.
+    const isOwner = perfil?.rol === 'admin';
 
     const adminWhatsApp = process.env.NEXT_PUBLIC_ADMIN_WHATSAPP || "573000000000" // Configure no .env
     const message = encodeURIComponent(`Hola, soy ${perfil?.nombre} (${perfil?.whatsapp}). Mi prueba gratuita terminó y quiero adquirir Premium.`)
@@ -50,7 +71,9 @@ export default async function SubscriptionPage() {
                 <div className="text-center space-y-2">
                     <h1 className="text-3xl font-bold tracking-tight">Finanzas Premium</h1>
                     <p className="text-muted-foreground text-lg px-4">
-                        Tu período de prueba ha terminado. Activa Premium para seguir teniendo el control de tu dinero.
+                        {isOwner 
+                            ? "Tu período de prueba ha terminado. Activa Premium para seguir teniendo el control de tu dinero."
+                            : "El período de prueba de tu grupo familiar ha terminado. Pide al administrador que active Premium para seguir usando la app."}
                     </p>
                 </div>
 
@@ -103,7 +126,7 @@ export default async function SubscriptionPage() {
                     <CardFooter className="flex-col gap-4">
                         <Button asChild size="lg" className="w-full font-semibold shadow-md active:scale-[0.98] transition-all">
                             <a href={wpLink} target="_blank" rel="noopener noreferrer">
-                                Renovar por WhatsApp
+                                {isOwner ? "Renovar por WhatsApp" : "Contactar Administrador / Renovar"}
                             </a>
                         </Button>
                         <p className="text-xs text-center text-muted-foreground">
