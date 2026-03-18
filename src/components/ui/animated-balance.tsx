@@ -18,8 +18,8 @@ export function AnimatedBalance({ value, className }: AnimatedBalanceProps) {
     new Intl.NumberFormat("es-CO", {
       style: "currency",
       currency: "COP",
-      minimumFractionDigits: 0, // Na Colômbia os cêntimos não são comuns no dia a dia
-    }).format(Math.round(current))
+      minimumFractionDigits: 0,
+    }).format(Math.abs(Math.round(current)))
   );
 
   // Sempre que o valor real mudar (ex: o Supabase devolver o saldo atualizado), a animação dispara
