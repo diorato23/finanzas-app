@@ -24,7 +24,7 @@ export async function createTransaccion(formData: FormData) {
         descripcion: formData.get("descripcion"),
         monto: formData.get("monto"),
         tipo: formData.get("tipo"),
-        fecha_vencimiento: formData.get("fecha_vencimiento") || null,
+        fecha_vencimiento: formData.get("fecha_vencimiento") || new Date().toISOString().split("T")[0],
         categoria: formData.get("categoria"),
         estado: formData.get("estado"),
     }
@@ -75,7 +75,7 @@ export async function editTransaccion(formData: FormData) {
         descripcion: formData.get("descripcion"),
         monto: formData.get("monto"),
         tipo: formData.get("tipo"),
-        fecha_vencimiento: formData.get("fecha_vencimiento") || null,
+        fecha_vencimiento: formData.get("fecha_vencimiento") || new Date().toISOString().split("T")[0],
         categoria: formData.get("categoria"),
         estado: formData.get("estado"),
     }
@@ -156,7 +156,7 @@ export async function createTransaccionInternal(data: {
         .from("transacciones")
         .insert([{
             ...data,
-            fecha_vencimiento: data.fecha_vencimiento || null,
+            fecha_vencimiento: data.fecha_vencimiento || new Date().toISOString().split("T")[0],
             comprobante_url: data.comprobante_url || null
         }])
 

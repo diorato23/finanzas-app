@@ -11,8 +11,8 @@ export async function SummaryCardsWrapper() {
     const { data: transacciones } = await supabase
         .from("transacciones")
         .select("*")
-        .gte("created_at", firstDayOfMonth)
-        .lte("created_at", lastDayOfMonth)
+        .gte("fecha_vencimiento", firstDayOfMonth.split('T')[0])
+        .lte("fecha_vencimiento", lastDayOfMonth.split('T')[0])
 
     let totalCobrado = 0
     let totalPagado = 0
