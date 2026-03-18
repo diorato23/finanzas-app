@@ -8,9 +8,11 @@ interface SummaryCardProps {
     icon: LucideIcon;
     variant?: "default" | "success" | "danger";
     description?: string;
+    href?: string;
 }
 
 import { AnimatedBalance } from "@/components/ui/animated-balance";
+import Link from "next/link";
 
 export function SummaryCard({
     title,
@@ -18,9 +20,13 @@ export function SummaryCard({
     icon: Icon,
     variant = "default",
     description,
+    href,
 }: SummaryCardProps) {
-    return (
-        <Card className="overflow-hidden border-none bg-background/50 backdrop-blur-md shadow-lg hover:shadow-xl transition-all duration-300">
+    const cardContent = (
+        <Card className={cn(
+            "overflow-hidden border-none bg-background/50 backdrop-blur-md shadow-lg transition-all duration-300",
+            href ? "hover:shadow-xl hover:scale-[1.02] cursor-pointer" : ""
+        )}>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                 <CardTitle className="text-sm font-medium text-muted-foreground">
                     {title}
@@ -52,4 +58,14 @@ export function SummaryCard({
             </CardContent>
         </Card>
     );
+
+    if (href) {
+        return (
+            <Link href={href} className="block no-underline">
+                {cardContent}
+            </Link>
+        );
+    }
+
+    return cardContent;
 }

@@ -75,12 +75,14 @@ async function crearTransaccion(
         );
     }
 
+    const estado = tipo === "cobro" ? "recibido" : "pagado";
+
     const { error } = await supabase.from("transacciones").insert({
         descripcion,
         monto,
         tipo,
         categoria,
-        estado: "pendiente",
+        estado,
         user_id: perfil.id,
         familia_id: perfil.familia_id,
         fecha_vencimiento

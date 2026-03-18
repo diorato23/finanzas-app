@@ -47,6 +47,7 @@ export async function SummaryCardsWrapper() {
                 icon={TrendingUp}
                 variant="success"
                 description="Total esperado este mes"
+                href="/dashboard/transacciones"
             />
             <SummaryCard
                 title="Gastos"
@@ -54,6 +55,7 @@ export async function SummaryCardsWrapper() {
                 icon={TrendingDown}
                 variant="danger"
                 description="Total agendado este mes"
+                href="/dashboard/transacciones"
             />
         </div>
     )

@@ -1,6 +1,6 @@
 "use client"
 
-import { useTransition, useState } from "react"
+import { useTransition, useState, useEffect } from "react"
 import { createTransaccion } from "../actions"
 import { toast } from "sonner"
 import { db } from "@/lib/db-local"
@@ -59,12 +59,23 @@ export default function NuevaTransaccionClient({ categoriasDisponibles }: { cate
             montoVisual: "",
             descripcion: "",
             categoria: categoriasDisponibles[0] || "",
-            estado: "pendiente",
+            estado: "pagado",
             fecha_vencimiento: "",
         },
     })
 
     const descripcion = form.watch("descripcion")
+    const tipo = form.watch("tipo")
+
+    // Sincroniza o estado inicial com o tipo selecionado
+    useEffect(() => {
+        // Só altera automaticamente se o estado for um dos padrões que queremos automatizar
+        if (tipo === "pago") {
+            form.setValue("estado", "pagado")
+        } else if (tipo === "cobro") {
+            form.setValue("estado", "recibido")
+        }
+    }, [tipo, form])
 
     const handleMagia = async () => {
         if (!rawSms) return
