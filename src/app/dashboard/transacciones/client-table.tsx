@@ -1,4 +1,4 @@
-"use client"
+﻿"use client"
 
 import { motion, AnimatePresence } from "framer-motion"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
@@ -55,13 +55,13 @@ export function ClientTable({ transacciones, categoriasDisponibles }: ClientTabl
     }
 
     const handleDelete = async (id: string) => {
-        if (!confirm("¿Eliminar esta transacción?")) return
+        if (!confirm("Â¿Eliminar esta transacciÃ³n?")) return
         startTransition(async () => {
             const res = await deleteTransaccion(id)
             if (res?.error) {
                 toast.error(res.error)
             } else {
-                toast.success("Transacción eliminada")
+                toast.success("TransacciÃ³n eliminada")
             }
         })
     }
@@ -80,8 +80,8 @@ export function ClientTable({ transacciones, categoriasDisponibles }: ClientTabl
                 <TableHeader className="bg-muted/50">
                     <TableRow className="hover:bg-transparent">
                         <TableHead className="font-semibold text-muted-foreground">Fecha</TableHead>
-                        <TableHead className="font-semibold text-muted-foreground">Descripción</TableHead>
-                        <TableHead className="font-semibold text-muted-foreground hidden md:table-cell">Categoría</TableHead>
+                        <TableHead className="font-semibold text-muted-foreground">DescripciÃ³n</TableHead>
+                        <TableHead className="font-semibold text-muted-foreground hidden md:table-cell">CategorÃ­a</TableHead>
                         <TableHead className="font-semibold text-muted-foreground hidden lg:table-cell">Responsable</TableHead>
                         <TableHead className="font-semibold text-muted-foreground">Monto</TableHead>
                         <TableHead className="font-semibold text-muted-foreground text-center">Estado</TableHead>
@@ -111,11 +111,6 @@ export function ClientTable({ transacciones, categoriasDisponibles }: ClientTabl
                                         <SafeDate>
                                             <div className="text-sm font-medium">
                                                 {new Intl.DateTimeFormat('es-CO', { day: '2-digit', month: 'short' }).format(new Date(t.created_at))}
-                                            </div>
-                                        </SafeDate>
-                                    </TableCell>
-                                    <TableCell className="font-medium">
-                                        {t.descripcion}
                                         <div className="md:hidden text-xs text-muted-foreground mt-0.5">
                                             {getCategoryWithEmoji(t.categoria)}
                                         </div>
@@ -156,7 +151,7 @@ export function ClientTable({ transacciones, categoriasDisponibles }: ClientTabl
                                                 onClick={() => handleDelete(t.id)}
                                                 disabled={isPending}
                                                 className="h-8 w-8 text-rose-500 hover:text-rose-700 hover:bg-rose-50" 
-                                                title="Eliminar Transacción"
+                                                title="Eliminar TransacciÃ³n"
                                             >
                                                 <TrashIcon className="w-4 h-4" />
                                                 <span className="sr-only">Eliminar</span>
