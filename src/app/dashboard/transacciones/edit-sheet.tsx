@@ -43,7 +43,6 @@ const formSchema = z.object({
   descripcion: z.string().min(1, "Campo requerido"),
   categoria: z.string().min(1, "Campo requerido"),
   estado: z.enum(["pendiente", "pagado", "recibido"]),
-  fecha_vencimiento: z.string().optional(),
 })
 
 export function EditTransactionSheet({
@@ -59,9 +58,6 @@ export function EditTransactionSheet({
     const [errorInfo, setErrorInfo] = useState<null | { error?: string; details?: unknown }>(null)
     const [isAiLoading, setIsAiLoading] = useState(false)
 
-    const defaultDate = transaccion.fecha_vencimiento
-        ? new Date(transaccion.fecha_vencimiento).toISOString().split('T')[0]
-        : ""
 
     const safeTipo: z.infer<typeof formSchema>["tipo"] =
         transaccion.tipo === "cobro" ? "cobro" : "pago"
@@ -77,7 +73,6 @@ export function EditTransactionSheet({
             descripcion: transaccion.descripcion || "",
             categoria: transaccion.categoria || categoriasDisponibles[0] || "",
             estado: safeEstado,
-            fecha_vencimiento: defaultDate,
         },
     })
 
@@ -115,9 +110,6 @@ export function EditTransactionSheet({
         formData.append("descripcion", values.descripcion)
         formData.append("categoria", values.categoria)
         formData.append("estado", values.estado)
-        if (values.fecha_vencimiento) {
-            formData.append("fecha_vencimiento", values.fecha_vencimiento)
-        }
 
         setErrorInfo(null)
 
@@ -143,10 +135,9 @@ export function EditTransactionSheet({
                 descripcion: transaccion.descripcion || "",
                 categoria: transaccion.categoria || categoriasDisponibles[0] || "",
                 estado: safeEstado,
-                fecha_vencimiento: defaultDate,
             })
         }
-    }, [open, transaccion, categoriasDisponibles, defaultDate, form, safeTipo, safeEstado])
+    }, [open, transaccion, categoriasDisponibles, form, safeTipo, safeEstado])
 
     if (!mounted) {
         return (
@@ -320,5 +311,4 @@ type TransaccionEditRow = {
     descripcion?: string | null
     categoria?: string | null
     estado?: "pendiente" | "pagado" | "recibido" | string | null
-    fecha_vencimiento?: string | null
 }

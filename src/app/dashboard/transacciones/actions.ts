@@ -9,7 +9,6 @@ const transaccionSchema = z.object({
     descripcion: z.string().min(2, "La descripción es muy corta"),
     monto: z.coerce.number().positive("El monto debe ser mayor a 0"),
     tipo: z.enum(["pago", "cobro"]),
-    fecha_vencimiento: z.string().optional(),
     categoria: z.string().min(2, "Selecciona una categoría válida"),
     estado: z.enum(["pendiente", "pagado", "recibido"]),
 })
@@ -24,7 +23,6 @@ export async function createTransaccion(formData: FormData) {
         descripcion: formData.get("descripcion"),
         monto: formData.get("monto"),
         tipo: formData.get("tipo"),
-        fecha_vencimiento: formData.get("fecha_vencimiento") || new Date().toISOString().split("T")[0],
         categoria: formData.get("categoria"),
         estado: formData.get("estado"),
     }
@@ -75,7 +73,6 @@ export async function editTransaccion(formData: FormData) {
         descripcion: formData.get("descripcion"),
         monto: formData.get("monto"),
         tipo: formData.get("tipo"),
-        fecha_vencimiento: formData.get("fecha_vencimiento") || new Date().toISOString().split("T")[0],
         categoria: formData.get("categoria"),
         estado: formData.get("estado"),
     }
@@ -147,7 +144,6 @@ export async function createTransaccionInternal(data: {
     estado: "pendiente" | "pagado" | "recibido";
     user_id: string;
     familia_id: string;
-    fecha_vencimiento?: string | null;
     comprobante_url?: string | null;
 }) {
     const supabase = await createClient()
@@ -156,7 +152,6 @@ export async function createTransaccionInternal(data: {
         .from("transacciones")
         .insert([{
             ...data,
-            fecha_vencimiento: data.fecha_vencimiento || new Date().toISOString().split("T")[0],
             comprobante_url: data.comprobante_url || null
         }])
 

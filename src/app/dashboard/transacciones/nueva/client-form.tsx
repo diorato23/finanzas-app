@@ -42,7 +42,6 @@ const formSchema = z.object({
   descripcion: z.string().min(1, "Campo requerido"),
   categoria: z.string().min(1, "Campo requerido"),
   estado: z.enum(["pendiente", "pagado", "recibido"]),
-  fecha_vencimiento: z.string().optional(),
 })
 
 export default function NuevaTransaccionClient({ categoriasDisponibles }: { categoriasDisponibles: string[] }) {
@@ -60,7 +59,6 @@ export default function NuevaTransaccionClient({ categoriasDisponibles }: { cate
             descripcion: "",
             categoria: categoriasDisponibles[0] || "",
             estado: "pagado",
-            fecha_vencimiento: "",
         },
     })
 
@@ -98,9 +96,6 @@ export default function NuevaTransaccionClient({ categoriasDisponibles }: { cate
                     form.setValue("categoria", aiData.suggestedCategory) // Will fallback to what's generated
                 }
 
-                if (aiData.date) {
-                    form.setValue("fecha_vencimiento", aiData.date)
-                }
                 
                 toast.success("¡Datos extraídos con éxito!", {
                     icon: <SparklesIcon className="h-4 w-4 text-primary" />,
@@ -152,7 +147,6 @@ export default function NuevaTransaccionClient({ categoriasDisponibles }: { cate
                         tipo: values.tipo,
                         categoria: values.categoria,
                         estado: values.estado,
-                        fecha_vencimiento: values.fecha_vencimiento || null,
                         created_at: new Date().toISOString(),
                     })
                     toast.success("Guardado localmente (Offline) 📶", {
@@ -174,9 +168,6 @@ export default function NuevaTransaccionClient({ categoriasDisponibles }: { cate
         formData.append("descripcion", values.descripcion)
         formData.append("categoria", values.categoria)
         formData.append("estado", values.estado)
-        if (values.fecha_vencimiento) {
-            formData.append("fecha_vencimiento", values.fecha_vencimiento)
-        }
 
         startTransition(async () => {
             const res = await createTransaccion(formData)

@@ -1,4 +1,4 @@
-﻿"use client"
+"use client"
 
 import { motion, AnimatePresence } from "framer-motion"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
@@ -35,7 +35,6 @@ type TransaccionClientRow = {
     categoria: string
     estado: "pendiente" | "pagado" | "recibido" | string
     created_at: string
-    fecha_vencimiento?: string | null
     perfiles?: { nombre?: string | null } | null
 }
 
@@ -111,6 +110,11 @@ export function ClientTable({ transacciones, categoriasDisponibles }: ClientTabl
                                         <SafeDate>
                                             <div className="text-sm font-medium">
                                                 {new Intl.DateTimeFormat('es-CO', { day: '2-digit', month: 'short' }).format(new Date(t.created_at))}
+                                            </div>
+                                        </SafeDate>
+                                    </TableCell>
+                                    <TableCell className="font-medium">
+                                        {t.descripcion}
                                         <div className="md:hidden text-xs text-muted-foreground mt-0.5">
                                             {getCategoryWithEmoji(t.categoria)}
                                         </div>
