@@ -161,6 +161,7 @@ async function eliminarTransaccion(
         return NextResponse.json({ error: "El campo 'transaccion_id' es obligatorio." }, { status: 400 });
     }
 
+    // 1. Verificar que existe y pertenece a la familia
     const { data: existing, error: findError } = await supabase
         .from("transacciones")
         .select("id, descripcion, monto")
@@ -168,17 +169,31 @@ async function eliminarTransaccion(
         .eq("familia_id", perfil.familia_id)
         .maybeSingle();
 
-    if (findError || !existing) {
-        return NextResponse.json({ error: "Transacción no encontrada o no tienes permisos." }, { status: 404 });
+    if (findError) {
+        return NextResponse.json({ error: "Error al buscar transacción", detalle: findError.message }, { status: 500 });
     }
 
-    const { error } = await supabase
+    if (!existing) {
+        return NextResponse.json({ error: "Transacción no encontrada o no tienes permisos para eliminarla." }, { status: 404 });
+    }
+
+    // 2. Eliminar (usamos familia_id también por seguridad)
+    const { error, count } = await supabase
         .from("transacciones")
-        .delete()
-        .eq("id", transaccion_id);
+        .delete({ count: "exact" })
+        .eq("id", transaccion_id)
+        .eq("familia_id", perfil.familia_id);
 
     if (error) {
         return NextResponse.json({ error: "Error al eliminar la transacción", detalle: error.message }, { status: 500 });
+    }
+
+    // Si count es 0, algo raro pasó porque acabamos de verificar que existía
+    if (count === 0) {
+        return NextResponse.json({ 
+            success: false, 
+            error: "No se pudo eliminar el registro. Es posible que ya haya sido eliminado." 
+        }, { status: 409 });
     }
 
     return NextResponse.json({

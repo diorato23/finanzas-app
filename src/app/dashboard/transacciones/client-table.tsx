@@ -132,7 +132,7 @@ export function ClientTable({ transacciones, categoriasDisponibles }: ClientTabl
                                         {t.perfiles?.nombre || 'Desconocido'}
                                     </TableCell>
                                     <TableCell className={`font-bold tracking-tight ${isIncome ? 'text-emerald-600' : 'text-rose-600'}`}>
-                                        {isIncome ? '+' : '-'} {formatCOP(t.monto)}
+                                        {formatCOP(t.monto)}
                                     </TableCell>
                                     <TableCell className="text-center">
                                         {t.estado === 'pendiente' && <Badge variant="outline" className="text-amber-600 border-amber-200 bg-amber-50">Pendiente</Badge>}
