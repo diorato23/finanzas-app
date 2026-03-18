@@ -79,7 +79,7 @@ export function ClientTable({ transacciones, categoriasDisponibles }: ClientTabl
             <Table>
                 <TableHeader className="bg-muted/50">
                     <TableRow className="hover:bg-transparent">
-                        <TableHead className="font-semibold text-muted-foreground">Fecha/Vence</TableHead>
+                        <TableHead className="font-semibold text-muted-foreground">Fecha</TableHead>
                         <TableHead className="font-semibold text-muted-foreground">Descripción</TableHead>
                         <TableHead className="font-semibold text-muted-foreground hidden md:table-cell">Categoría</TableHead>
                         <TableHead className="font-semibold text-muted-foreground hidden lg:table-cell">Responsable</TableHead>
@@ -112,11 +112,6 @@ export function ClientTable({ transacciones, categoriasDisponibles }: ClientTabl
                                             <div className="text-sm font-medium">
                                                 {new Intl.DateTimeFormat('es-CO', { day: '2-digit', month: 'short' }).format(new Date(t.created_at))}
                                             </div>
-                                            {t.fecha_vencimiento && (
-                                                <div className="text-xs text-muted-foreground mt-0.5">
-                                                    Vence: {new Intl.DateTimeFormat('es-CO', { day: '2-digit', month: '2-digit', year: 'numeric' }).format(new Date(t.fecha_vencimiento))}
-                                                </div>
-                                            )}
                                         </SafeDate>
                                     </TableCell>
                                     <TableCell className="font-medium">

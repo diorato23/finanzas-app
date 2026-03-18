@@ -7,6 +7,7 @@ import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { TrashIcon, AlertCircle, TrendingDown } from "lucide-react"
 import { deletePresupuesto } from "./actions"
+import { DeleteButton } from "@/components/ui/delete-button"
 import { PresupuestoClientForm } from "./client-form"
 import { getCategoryWithEmoji } from "@/lib/utils"
 
@@ -152,9 +153,10 @@ export default async function PresupuestosPage({ searchParams }: { searchParams:
                                                     await deletePresupuesto(formData)
                                                 }}>
                                                     <input type="hidden" name="id" value={pres.id} />
-                                                    <Button type="submit" variant="ghost" size="icon" className="h-8 w-8 text-rose-500 hover:text-rose-700 hover:bg-rose-50 -mt-1 -mr-1">
-                                                        <TrashIcon className="w-4 h-4" />
-                                                    </Button>
+                                                    <DeleteButton
+                                                        message={`¿Estás seguro de que deseas eliminar el presupuesto de ${pres.categoria}?`}
+                                                        className="h-8 w-8 text-rose-500 hover:text-rose-700 hover:bg-rose-50 -mt-1 -mr-1"
+                                                    />
                                                 </form>
                                             )}
                                         </div>

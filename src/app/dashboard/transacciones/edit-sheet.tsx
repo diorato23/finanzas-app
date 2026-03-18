@@ -293,19 +293,6 @@ export function EditTransactionSheet({
                             />
                         </div>
 
-                        <FormField
-                            control={form.control}
-                            name="fecha_vencimiento"
-                            render={({ field }) => (
-                                <FormItem>
-                                    <FormLabel>Fecha de Vencimiento / Pago</FormLabel>
-                                    <FormControl>
-                                        <Input type="date" {...field} />
-                                    </FormControl>
-                                    <FormMessage />
-                                </FormItem>
-                            )}
-                        />
 
                         {errorInfo?.error && (
                             <div className="p-3 bg-red-50 text-red-600 rounded text-sm mb-4 mt-2">

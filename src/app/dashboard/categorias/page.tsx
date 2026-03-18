@@ -4,9 +4,9 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { TrashIcon, TagsIcon } from "lucide-react"
 import { addCategoria, deleteCategoria } from "./actions"
 import { getCategoryWithEmoji } from "@/lib/utils"
+import { DeleteButton } from "@/components/ui/delete-button"
 
 export default async function CategoriasPage() {
     const supabase = await createClient()
@@ -62,7 +62,6 @@ export default async function CategoriasPage() {
                     <Card className="rounded-[20px] shadow-sm border-border/50 md:col-span-2 overflow-hidden">
                         <CardHeader className="bg-accent/30 border-b border-border/50">
                             <CardTitle className="text-lg flex items-center gap-2">
-                                <TagsIcon className="w-5 h-5 text-primary" />
                                 Categorías Registradas
                             </CardTitle>
                         </CardHeader>
@@ -83,9 +82,7 @@ export default async function CategoriasPage() {
                                                     "use server"
                                                     await deleteCategoria(c.id)
                                                 }}>
-                                                    <Button variant="ghost" size="icon" type="submit" className="h-8 w-8 text-rose-500 hover:text-rose-700 hover:bg-rose-50" title="Eliminar Categoría">
-                                                        <TrashIcon className="w-4 h-4" />
-                                                    </Button>
+                                                    <DeleteButton message={`¿Estás seguro de que deseas eliminar la categoría "${c.nombre}"?`} />
                                                 </form>
                                             ) : (
                                                 <span className="text-xs text-muted-foreground">Oculto</span>

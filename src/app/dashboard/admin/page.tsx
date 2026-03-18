@@ -5,7 +5,8 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { promoteToCoAdmin, removeMember } from "./actions"
-import { TrashIcon, UsersIcon, ShieldAlert } from "lucide-react"
+import { UsersIcon, ShieldAlert } from "lucide-react"
+import { DeleteButton } from "@/components/ui/delete-button"
 
 export default async function FamiliaPage() {
     const supabase = await createClient()
@@ -104,9 +105,7 @@ export default async function FamiliaPage() {
                                                 </form>
                                                 <form action={removeMember}>
                                                     <input type="hidden" name="perfilId" value={m.id} />
-                                                    <Button variant="ghost" size="icon" type="submit" className="h-8 w-8 text-rose-500 hover:text-rose-700 hover:bg-rose-50" title="Remover">
-                                                        <TrashIcon className="w-4 h-4" />
-                                                    </Button>
+                                                    <DeleteButton message={`¿Estás seguro de que deseas remover a ${m.nombre} de la familia?`} />
                                                 </form>
                                             </div>
                                         )}
