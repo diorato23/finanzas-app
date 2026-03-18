@@ -43,11 +43,13 @@ export function BiometricActivation() {
                 })
                 setIsRegistered(true)
             }
-        } catch (error: any) {
+        } catch (error: unknown) {
             console.error(error)
-            if (error.name !== "AbortError") {
+            const name = (error as { name?: unknown })?.name
+            const message = error instanceof Error ? error.message : undefined
+            if (name !== "AbortError") {
                 toast.error("Error ao configurar biometria", {
-                    description: error.message || "Asegúrate de tener un PIN o biometría activa en tu equipo.",
+                    description: message || "Asegúrate de tener un PIN o biometría activa en tu equipo.",
                 })
             }
         } finally {

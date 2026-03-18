@@ -15,6 +15,9 @@ import { revalidatePath } from "next/cache"
 const RP_ID = "localhost" // Ajustar para o domínio real em produção
 const ORIGIN = `http://${RP_ID}:3000` // Ajustar para https e domínio em produção
 
+type RegistrationResponse = Parameters<typeof verifyRegistrationResponse>[0]["response"]
+type AuthenticationResponse = Parameters<typeof verifyAuthenticationResponse>[0]["response"]
+
 /**
  * Passo 1: Gerar opções de registro (atividades no Dashboard)
  */
@@ -61,7 +64,7 @@ export async function getRegistrationOptions() {
 /**
  * Passo 2: Verificar e salvar a nova credencial
  */
-export async function verifyRegistration(body: any) {
+export async function verifyRegistration(body: unknown) {
     const supabase = await createClient()
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) throw new Error("Não autorizado")
@@ -72,7 +75,7 @@ export async function verifyRegistration(body: any) {
     if (!expectedChallenge) throw new Error("Desafio expirado ou ausente")
 
     const verification = await verifyRegistrationResponse({
-        response: body,
+        response: body as RegistrationResponse,
         expectedChallenge,
         expectedOrigin: ORIGIN,
         expectedRPID: RP_ID,
@@ -125,7 +128,7 @@ export async function getAuthenticationOptions() {
 /**
  * Passo 4: Verificar login biométrico
  */
-export async function verifyAuthentication(body: any) {
+export async function verifyAuthentication(body: unknown) {
     const supabase = await createClient()
     const cookieStore = await cookies()
     const expectedChallenge = cookieStore.get("authentication_challenge")?.value
@@ -133,17 +136,17 @@ export async function verifyAuthentication(body: any) {
     if (!expectedChallenge) throw new Error("Desafio expirado")
 
     // Buscar a credencial no banco pelo ID enviado pelo navegador
-    const credentialID = body.id
+    const credentialID = (body as { id?: unknown })?.id
     const { data: dbCredential } = await supabase
         .from("user_credentials")
         .select("*")
-        .eq("credential_id", credentialID)
+        .eq("credential_id", String(credentialID ?? ""))
         .single()
 
     if (!dbCredential) throw new Error("Credencial não reconhecida")
 
     const verification = await verifyAuthenticationResponse({
-        response: body,
+        response: body as AuthenticationResponse,
         expectedChallenge,
         expectedOrigin: ORIGIN,
         expectedRPID: RP_ID,

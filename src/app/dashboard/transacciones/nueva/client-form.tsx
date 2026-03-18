@@ -47,7 +47,7 @@ const formSchema = z.object({
 
 export default function NuevaTransaccionClient({ categoriasDisponibles }: { categoriasDisponibles: string[] }) {
     const [isPending, startTransition] = useTransition()
-    const [errorInfo, setErrorInfo] = useState<any>(null)
+    const [errorInfo, setErrorInfo] = useState<null | { error?: string; details?: unknown }>(null)
     const [isAiLoading, setIsAiLoading] = useState(false)
     const [rawSms, setRawSms] = useState("")
     const [isAiParsing, setIsAiParsing] = useState(false)
@@ -362,7 +362,7 @@ export default function NuevaTransaccionClient({ categoriasDisponibles }: { cate
                             {errorInfo?.error && (
                                 <div className="p-3 bg-red-50 text-red-600 rounded text-sm mb-4 mt-2">
                                     <p className="font-semibold">{errorInfo.error}</p>
-                                    {errorInfo.details && <p>{JSON.stringify(errorInfo.details)}</p>}
+                                    {errorInfo.details != null && <p>{JSON.stringify(errorInfo.details)}</p>}
                                 </div>
                             )}
 

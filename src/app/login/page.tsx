@@ -93,7 +93,7 @@ export default function LoginPage({ searchParams }: { searchParams: Promise<{ er
                             <div className="space-y-2">
                                 <Label htmlFor="whatsapp">WhatsApp (Para el Bot)</Label>
                                 <Input id="whatsapp" name="whatsapp" type="tel" placeholder="Ej: 573001234567" required />
-                                <p className="text-[0.8rem] text-muted-foreground">Incluye el código de país sin el '+'.</p>
+                                <p className="text-[0.8rem] text-muted-foreground">Incluye el código de país sin el &apos;+&apos;.</p>
                             </div>
                             <div className="space-y-2">
                                 <Label htmlFor="password-signup">Contraseña</Label>

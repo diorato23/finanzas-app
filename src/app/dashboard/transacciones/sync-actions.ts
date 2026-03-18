@@ -3,7 +3,17 @@
 import { createClient } from "@/lib/supabase/server"
 import { revalidatePath } from "next/cache"
 
-export async function syncOfflineTransactions(transactions: any[]) {
+type OfflineTransaction = {
+    descripcion: string
+    monto: number
+    tipo: string
+    categoria: string
+    estado: string
+    fecha_vencimiento?: string | null
+    created_at: string
+}
+
+export async function syncOfflineTransactions(transactions: OfflineTransaction[]) {
     const supabase = await createClient()
 
     const { data: { user } } = await supabase.auth.getUser()
@@ -19,7 +29,7 @@ export async function syncOfflineTransactions(transactions: any[]) {
     if (!perfil) return { error: "Perfil no encontrado" }
 
     // Preparar dados para o Supabase
-    const dataToInsert = transactions.map(t => ({
+    const dataToInsert = transactions.map((t) => ({
         descripcion: t.descripcion,
         monto: t.monto,
         tipo: t.tipo,

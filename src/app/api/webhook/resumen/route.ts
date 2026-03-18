@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { authenticateWebhook, parseBody } from "../lib/auth";
+import type { SupabaseClient } from "@supabase/supabase-js";
 
 export const dynamic = "force-dynamic";
 
@@ -35,8 +36,14 @@ export async function POST(req: NextRequest) {
 // ──────────────────────────────────────
 // RESUMEN DEL MES ACTUAL
 // ──────────────────────────────────────
+type TransaccionLite = {
+    tipo: string | null;
+    monto: number | string | null;
+    categoria?: string | null;
+};
+
 async function resumenMes(
-    supabase: any,
+    supabase: SupabaseClient,
     perfil: { id: string; familia_id: string }
 ) {
     const now = new Date();
@@ -59,7 +66,7 @@ async function resumenMes(
     let totalIngresos = 0;
     let numTransacciones = 0;
 
-    (data || []).forEach(t => {
+    ((data ?? []) as unknown as TransaccionLite[]).forEach((t: TransaccionLite) => {
         const monto = Number(t.monto);
         if (t.tipo === "cobro") {
             totalIngresos += monto;
@@ -88,7 +95,7 @@ async function resumenMes(
 // RESUMEN POR PERÍODO
 // ──────────────────────────────────────
 async function resumenPeriodo(
-    supabase: any,
+    supabase: SupabaseClient,
     perfil: { id: string; familia_id: string },
     body: Record<string, unknown>
 ) {
@@ -116,7 +123,7 @@ async function resumenPeriodo(
     let totalGastos = 0;
     let totalIngresos = 0;
 
-    (data || []).forEach(t => {
+    ((data ?? []) as unknown as TransaccionLite[]).forEach((t: TransaccionLite) => {
         if (t.tipo === "cobro") totalIngresos += Number(t.monto);
         else totalGastos += Number(t.monto);
     });
@@ -139,7 +146,7 @@ async function resumenPeriodo(
 // GASTOS POR CATEGORÍA
 // ──────────────────────────────────────
 async function porCategoria(
-    supabase: any,
+    supabase: SupabaseClient,
     perfil: { id: string; familia_id: string },
     body: Record<string, unknown>
 ) {
@@ -162,7 +169,7 @@ async function porCategoria(
 
     const categorias: Record<string, { total: number; count: number }> = {};
 
-    (data || []).forEach(t => {
+    ((data ?? []) as unknown as TransaccionLite[]).forEach((t: TransaccionLite) => {
         const cat = t.categoria || "Otros";
         if (!categorias[cat]) categorias[cat] = { total: 0, count: 0 };
         categorias[cat].total += Number(t.monto);

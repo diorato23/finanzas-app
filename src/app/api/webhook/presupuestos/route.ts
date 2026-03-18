@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { authenticateWebhook, parseBody } from "../lib/auth";
+import type { SupabaseClient } from "@supabase/supabase-js";
 
 export const dynamic = "force-dynamic";
 
@@ -38,11 +39,14 @@ export async function POST(req: NextRequest) {
     }
 }
 
+type PresupuestoRow = { categoria: string; monto_limite: number | string };
+type TransaccionCatMonto = { categoria: string | null; monto: number | string | null };
+
 // ──────────────────────────────────────
 // DEFINIR / ACTUALIZAR PRESUPUESTO
 // ──────────────────────────────────────
 async function definirPresupuesto(
-    supabase: any,
+    supabase: SupabaseClient,
     perfil: { id: string; familia_id: string; rol: string },
     body: Record<string, unknown>
 ) {
@@ -91,7 +95,7 @@ async function definirPresupuesto(
 // CONSULTAR PRESUPUESTOS
 // ──────────────────────────────────────
 async function consultarPresupuesto(
-    supabase: any,
+    supabase: SupabaseClient,
     perfil: { id: string; familia_id: string },
     body: Record<string, unknown>
 ) {
@@ -107,7 +111,8 @@ async function consultarPresupuesto(
         .eq("familia_id", perfil.familia_id)
         .eq("mes_anio", mesAnio);
 
-    if (!presupuestos || presupuestos.length === 0) {
+    const presupuestosTyped = (presupuestos ?? []) as unknown as PresupuestoRow[];
+    if (presupuestosTyped.length === 0) {
         return NextResponse.json({
             success: true,
             mensaje: `No tienes presupuestos definidos para ${mesAnio}`,
@@ -125,21 +130,22 @@ async function consultarPresupuesto(
         .lte("created_at", ultimoDia + "T23:59:59");
 
     const gastosPorCat: Record<string, number> = {};
-    (transacciones || []).forEach((t: any) => {
+    ((transacciones ?? []) as unknown as TransaccionCatMonto[]).forEach((t: TransaccionCatMonto) => {
         const cat = t.categoria || "Otros";
         gastosPorCat[cat] = (gastosPorCat[cat] || 0) + Number(t.monto);
     });
 
     const fmt = (n: number) => `$${n.toLocaleString("es-CO")}`;
 
-    const resultado = presupuestos.map((p: any) => {
+    const resultado = presupuestosTyped.map((p: PresupuestoRow) => {
         const gastado = gastosPorCat[p.categoria] || 0;
-        const restante = p.monto_limite - gastado;
-        const porcentaje = Math.round((gastado / p.monto_limite) * 100);
+        const limite = Number(p.monto_limite);
+        const restante = limite - gastado;
+        const porcentaje = limite > 0 ? Math.round((gastado / limite) * 100) : 0;
 
         return {
             categoria: p.categoria,
-            limite: fmt(p.monto_limite),
+            limite: fmt(limite),
             gastado: fmt(gastado),
             restante: fmt(restante),
             porcentaje: `${porcentaje}%`,
@@ -158,7 +164,7 @@ async function consultarPresupuesto(
 // ELIMINAR PRESUPUESTO
 // ──────────────────────────────────────
 async function eliminarPresupuesto(
-    supabase: any,
+    supabase: SupabaseClient,
     perfil: { id: string; familia_id: string; rol: string },
     body: Record<string, unknown>
 ) {

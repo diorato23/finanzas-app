@@ -37,10 +37,10 @@ export async function parseTransactionText(rawText: string, availableCategories:
     });
 
     return { success: true, data: object };
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Error al analizar notificación:", error);
     // Mostrar el error real de la IA si es posible
-    if (error?.message) {
+    if (error instanceof Error) {
       console.error("Detalles del error IA:", error.message);
     }
     return { success: false, error: "No pude entender el formato o hubo un error con la IA. Comunícate con soporte o llena los datos manualmente." };

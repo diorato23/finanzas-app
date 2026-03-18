@@ -53,7 +53,7 @@ export default async function CategoriasPage() {
                 <Card className="border-amber-200 bg-amber-50">
                     <CardHeader>
                         <CardTitle className="text-amber-800">Incompleto: Falta Base de Datos</CardTitle>
-                        <CardDescription className="text-amber-700">La tabla "categorias" aún no existe en tu Supabase.</CardDescription>
+                        <CardDescription className="text-amber-700">La tabla &quot;categorias&quot; aún no existe en tu Supabase.</CardDescription>
                     </CardHeader>
                 </Card>
             ) : (

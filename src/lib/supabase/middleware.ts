@@ -44,9 +44,13 @@ export async function updateSession(request: NextRequest) {
 
     if (user && isAuthRoute) {
         // If user is already logged in, redirect away from auth routes
-        const url = request.nextUrl.clone()
-        url.pathname = '/dashboard' // or your main authenticated route
-        return NextResponse.redirect(url)
+        // BUT only if there's no error parameter (prevents redirect loop if profile is missing)
+        const hasError = request.nextUrl.searchParams.has('error')
+        if (!hasError) {
+            const url = request.nextUrl.clone()
+            url.pathname = '/dashboard' // or your main authenticated route
+            return NextResponse.redirect(url)
+        }
     }
 
     return supabaseResponse

@@ -23,8 +23,20 @@ function formatCOP(amount: number) {
 }
 
 interface ClientTableProps {
-    transacciones: any[]
+    transacciones: TransaccionClientRow[]
     categoriasDisponibles: string[]
+}
+
+type TransaccionClientRow = {
+    id: string
+    tipo: "pago" | "cobro" | string
+    monto: number
+    descripcion: string
+    categoria: string
+    estado: "pendiente" | "pagado" | "recibido" | string
+    created_at: string
+    fecha_vencimiento?: string | null
+    perfiles?: { nombre?: string | null } | null
 }
 
 export function ClientTable({ transacciones, categoriasDisponibles }: ClientTableProps) {

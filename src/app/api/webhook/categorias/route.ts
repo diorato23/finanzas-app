@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { authenticateWebhook, parseBody } from "../lib/auth";
+import type { SupabaseClient } from "@supabase/supabase-js";
 
 export const dynamic = "force-dynamic";
 
@@ -38,8 +39,10 @@ export async function POST(req: NextRequest) {
 // ──────────────────────────────────────
 // LISTAR
 // ──────────────────────────────────────
+type CategoriaRow = { id: string; nombre: string };
+
 async function listarCategorias(
-    supabase: any,
+    supabase: SupabaseClient,
     perfil: { id: string; familia_id: string }
 ) {
     const { data, error } = await supabase
@@ -55,7 +58,7 @@ async function listarCategorias(
     return NextResponse.json({
         success: true,
         total: (data || []).length,
-        categorias: (data || []).map((c: any) => ({ id: c.id, nombre: c.nombre }))
+        categorias: ((data ?? []) as unknown as CategoriaRow[]).map((c: CategoriaRow) => ({ id: c.id, nombre: c.nombre }))
     });
 }
 
@@ -63,7 +66,7 @@ async function listarCategorias(
 // CREAR
 // ──────────────────────────────────────
 async function crearCategoria(
-    supabase: any,
+    supabase: SupabaseClient,
     perfil: { id: string; familia_id: string; rol: string },
     body: Record<string, unknown>
 ) {
@@ -94,7 +97,7 @@ async function crearCategoria(
 // ELIMINAR
 // ──────────────────────────────────────
 async function eliminarCategoria(
-    supabase: any,
+    supabase: SupabaseClient,
     perfil: { id: string; familia_id: string; rol: string },
     body: Record<string, unknown>
 ) {

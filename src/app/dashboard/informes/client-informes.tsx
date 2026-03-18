@@ -23,6 +23,18 @@ type InformeData = {
     ingresos: number
     gastos: number
 }
+
+type TooltipEntry = {
+    color?: string
+    name?: string
+    value?: number
+}
+
+type TooltipProps = {
+    active?: boolean
+    payload?: TooltipEntry[]
+    label?: string
+}
 export type CategoriaData = {
     nombre: string
 }
@@ -50,20 +62,20 @@ export function InformeClient({ categories }: { categories: CategoriaData[] }) {
         }).format(amount)
     }
 
-    const CustomTooltip = ({ active, payload, label }: any) => {
+    const CustomTooltip = ({ active, payload, label }: TooltipProps) => {
         if (active && payload && payload.length) {
             return (
                 <div className="bg-card/95 backdrop-blur-sm border border-border/50 shadow-xl p-3 rounded-xl min-w-[150px]">
                     <p className="text-xs font-semibold text-muted-foreground mb-3">{label}</p>
                     <div className="space-y-2">
-                        {payload.map((entry: any, index: number) => (
+                        {payload.map((entry: TooltipEntry, index: number) => (
                             <div key={`item-${index}`} className="flex items-center gap-2">
                                 <div className="size-2 rounded-full" style={{ backgroundColor: entry.color }} />
                                 <span className="text-sm font-medium text-foreground flex-1">
                                     {entry.name}
                                 </span>
                                 <span className="text-sm font-bold" style={{ color: entry.color }}>
-                                    {formatCurrency(entry.value)}
+                                    {formatCurrency(entry.value ?? 0)}
                                 </span>
                             </div>
                         ))}

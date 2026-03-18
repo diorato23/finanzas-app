@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { authenticateWebhook, parseBody } from "../lib/auth";
+import type { SupabaseClient } from "@supabase/supabase-js";
 
 export const dynamic = "force-dynamic";
 
@@ -39,6 +40,17 @@ export async function POST(req: NextRequest) {
     }
 }
 
+type TransaccionRow = {
+    id: string;
+    descripcion: string;
+    monto: number | string;
+    tipo: string;
+    categoria: string | null;
+    estado?: string | null;
+    created_at?: string | null;
+    fecha_vencimiento?: string | null;
+};
+
 // ──────────────────────────────────────
 // CREAR
 // ──────────────────────────────────────
@@ -46,7 +58,7 @@ export async function POST(req: NextRequest) {
 // CREAR
 // ──────────────────────────────────────
 async function crearTransaccion(
-    supabase: any,
+    supabase: SupabaseClient,
     perfil: { id: string; familia_id: string },
     body: Record<string, unknown>
 ) {
@@ -93,7 +105,7 @@ async function crearTransaccion(
 // LISTAR
 // ──────────────────────────────────────
 async function listarTransacciones(
-    supabase: any,
+    supabase: SupabaseClient,
     perfil: { id: string; familia_id: string },
     body: Record<string, unknown>
 ) {
@@ -118,7 +130,7 @@ async function listarTransacciones(
     }
 
     let message = "📝 *Tus últimas transacciones:*\n\n";
-    data.forEach((t: any) => {
+    ((data ?? []) as unknown as TransaccionRow[]).forEach((t: TransaccionRow) => {
         const emoji = t.tipo === "cobro" ? "📈" : "📉";
         const monto = Number(t.monto).toLocaleString("es-CO");
         message += `${emoji} *${t.descripcion}*\n💰 $${monto} | 📂 ${t.categoria}\n🆔 \`${t.id}\`\n\n`;
@@ -139,7 +151,7 @@ async function listarTransacciones(
 // ELIMINAR
 // ──────────────────────────────────────
 async function eliminarTransaccion(
-    supabase: any,
+    supabase: SupabaseClient,
     perfil: { id: string; familia_id: string },
     body: Record<string, unknown>
 ) {
@@ -182,7 +194,7 @@ async function eliminarTransaccion(
 // EDITAR
 // ──────────────────────────────────────
 async function editarTransaccion(
-    supabase: any,
+    supabase: SupabaseClient,
     perfil: { id: string; familia_id: string },
     body: Record<string, unknown>
 ) {

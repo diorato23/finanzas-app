@@ -11,6 +11,7 @@ import { EditIcon, SparklesIcon } from "lucide-react"
 import { getCategoryWithEmoji } from "@/lib/utils"
 import { suggestCategory } from "@/app/actions/ai-categorize"
 
+import type { Resolver } from "react-hook-form"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import * as z from "zod"
@@ -49,28 +50,33 @@ export function EditTransactionSheet({
     transaccion,
     categoriasDisponibles
 }: {
-    transaccion: any,
+    transaccion: TransaccionEditRow,
     categoriasDisponibles: string[]
 }) {
     const [mounted, setMounted] = useState(false)
     const [open, setOpen] = useState(false)
     const [isPending, startTransition] = useTransition()
-    const [errorInfo, setErrorInfo] = useState<any>(null)
+    const [errorInfo, setErrorInfo] = useState<null | { error?: string; details?: unknown }>(null)
     const [isAiLoading, setIsAiLoading] = useState(false)
 
     const defaultDate = transaccion.fecha_vencimiento
         ? new Date(transaccion.fecha_vencimiento).toISOString().split('T')[0]
         : ""
 
+    const safeTipo: z.infer<typeof formSchema>["tipo"] =
+        transaccion.tipo === "cobro" ? "cobro" : "pago"
+    const safeEstado: z.infer<typeof formSchema>["estado"] =
+        transaccion.estado === "pagado" || transaccion.estado === "recibido" ? transaccion.estado : "pendiente"
+
     const form = useForm<z.infer<typeof formSchema>>({
-        resolver: zodResolver(formSchema),
+        resolver: zodResolver(formSchema) as Resolver<z.infer<typeof formSchema>>,
         defaultValues: {
             id: transaccion.id,
-            tipo: transaccion.tipo || "pago",
+            tipo: safeTipo,
             montoVisual: formatToCurrencyInput(transaccion.monto),
             descripcion: transaccion.descripcion || "",
             categoria: transaccion.categoria || categoriasDisponibles[0] || "",
-            estado: transaccion.estado || "pendiente",
+            estado: safeEstado,
             fecha_vencimiento: defaultDate,
         },
     })
@@ -132,15 +138,15 @@ export function EditTransactionSheet({
         if (open) {
             form.reset({
                 id: transaccion.id,
-                tipo: transaccion.tipo || "pago",
+                tipo: safeTipo,
                 montoVisual: formatToCurrencyInput(transaccion.monto),
                 descripcion: transaccion.descripcion || "",
                 categoria: transaccion.categoria || categoriasDisponibles[0] || "",
-                estado: transaccion.estado || "pendiente",
+                estado: safeEstado,
                 fecha_vencimiento: defaultDate,
             })
         }
-    }, [open, transaccion, categoriasDisponibles, defaultDate, form])
+    }, [open, transaccion, categoriasDisponibles, defaultDate, form, safeTipo, safeEstado])
 
     if (!mounted) {
         return (
@@ -304,7 +310,7 @@ export function EditTransactionSheet({
                         {errorInfo?.error && (
                             <div className="p-3 bg-red-50 text-red-600 rounded text-sm mb-4 mt-2">
                                 <p className="font-semibold">{errorInfo.error}</p>
-                                {errorInfo.details && <p>{JSON.stringify(errorInfo.details)}</p>}
+                                {errorInfo.details != null && <p>{JSON.stringify(errorInfo.details)}</p>}
                             </div>
                         )}
 
@@ -320,3 +326,12 @@ export function EditTransactionSheet({
     )
 }
 
+type TransaccionEditRow = {
+    id: string
+    tipo?: "pago" | "cobro" | string | null
+    monto: number | string
+    descripcion?: string | null
+    categoria?: string | null
+    estado?: "pendiente" | "pagado" | "recibido" | string | null
+    fecha_vencimiento?: string | null
+}

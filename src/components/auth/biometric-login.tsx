@@ -39,9 +39,10 @@ export function BiometricLogin() {
                 router.push("/dashboard")
                 router.refresh()
             }
-        } catch (error: any) {
+        } catch (error: unknown) {
             console.error(error)
-            if (error.name !== "AbortError") {
+            const name = (error as { name?: unknown })?.name
+            if (name !== "AbortError") {
                 toast.error("Error de autenticación", {
                     description: "No se reconoció la huella o el dispositivo.",
                 })

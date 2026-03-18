@@ -7,7 +7,7 @@ import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { addPresupuesto } from "./actions"
 import { PlusCircle } from "lucide-react"
-import { useEffect, useState } from "react"
+import { useSyncExternalStore } from "react"
 import { getCategoryWithEmoji } from "@/lib/utils"
 
 export function PresupuestoClientForm({
@@ -17,11 +17,13 @@ export function PresupuestoClientForm({
     selectedMonth: string
     allCategories: string[]
 }) {
-    const [mounted, setMounted] = useState(false)
-
-    useEffect(() => {
-        setMounted(true)
-    }, [])
+    const mounted = useSyncExternalStore(
+        () => () => {
+            // no-op
+        },
+        () => true,
+        () => false
+    )
 
     if (!mounted) return null
 

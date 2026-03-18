@@ -33,7 +33,7 @@ export default async function DashboardLayout({
             
             if (profileError) console.error("Erro Supabase Perfil:", profileError)
             perfil = data
-        } catch (e: any) {
+        } catch (e: unknown) {
             console.error("Erro ao buscar perfil:", e)
         }
 
@@ -78,11 +78,12 @@ export default async function DashboardLayout({
                 </div>
             </SidebarProvider>
         )
-    } catch (error: any) {
+    } catch (error: unknown) {
+        const err = error instanceof Error ? error : new Error(String(error))
         return (
             <div className="p-10 bg-red-100 text-red-900 border-2 border-red-500 rounded-lg m-4">
                 <h1 className="text-xl font-bold mb-2">ERRO FATAL NO LAYOUT</h1>
-                <pre className="whitespace-pre-wrap text-sm">{error.stack || error.message || String(error)}</pre>
+                <pre className="whitespace-pre-wrap text-sm">{err.stack || err.message || String(err)}</pre>
             </div>
         )
     }

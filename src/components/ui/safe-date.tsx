@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, ReactNode } from "react";
+import { ReactNode, useSyncExternalStore } from "react";
 
 interface SafeDateProps {
   children: ReactNode;
@@ -13,11 +13,13 @@ interface SafeDateProps {
  * after the component has mounted on the client.
  */
 export function SafeDate({ children, fallback = null }: SafeDateProps) {
-  const [isMounted, setIsMounted] = useState(false);
-
-  useEffect(() => {
-    setIsMounted(true);
-  }, []);
+  const isMounted = useSyncExternalStore(
+    () => () => {
+      // no-op
+    },
+    () => true,
+    () => false
+  );
 
   if (!isMounted) {
     return <>{fallback}</>;
