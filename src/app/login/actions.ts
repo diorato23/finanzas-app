@@ -59,15 +59,24 @@ export async function signup(formData: FormData) {
         redirect(`/login?error=${errMsj}`)
     }
 
-    // 2.5 Force login immediately to set session cookies for RLS bypass
-    const { error: loginError } = await supabase.auth.signInWithPassword({
-        email,
-        password,
-    })
+    // 2.5 Manejo de sesión después del registro
+    // En muchos proyectos Supabase ya devuelve una sesión válida en signUp
+    // (cuando no se requiere confirmación de email). Solo forzamos login si
+    // no hay sesión pero está permitido hacerlo.
+    if (!authData.session) {
+        const { data: loginData, error: loginError } = await supabase.auth.signInWithPassword({
+            email,
+            password,
+        })
 
-    if (loginError) {
-        const msg = encodeURIComponent("Login después del registro: " + loginError.message)
-        redirect(`/login?error=${msg}`)
+        // Si el proyecto exige confirmación de e‑mail, este login va a fallar.
+        // En ese caso, enviamos o usuário de volta pra tela de login com msg clara.
+        if (loginError || !loginData.session) {
+            const msg = encodeURIComponent(
+                "Revisa tu correo para confirmar tu cuenta antes de iniciar sesión."
+            )
+            redirect(`/login?error=${msg}`)
+        }
     }
 
     let finalFamiliaId = codigoFamilia
