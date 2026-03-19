@@ -5,8 +5,9 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { promoteToCoAdmin, removeMember } from "./actions"
-import { UsersIcon, ShieldAlert } from "lucide-react"
+import { UsersIcon, ShieldAlert, Share2Icon } from "lucide-react"
 import { DeleteButton } from "@/components/ui/delete-button"
+import { CopyCodeButton } from "@/components/ui/copy-code-button"
 
 export default async function FamiliaPage() {
     const supabase = await createClient()
@@ -55,13 +56,27 @@ export default async function FamiliaPage() {
                         </CardTitle>
                         <CardDescription>Comparte este código con tus dependientes para que se registren.</CardDescription>
                     </CardHeader>
-                    <CardContent className="pt-6">
+                    <CardContent className="pt-6 space-y-4">
                         <div className="flex items-center justify-between p-3 bg-muted rounded-xl border border-border/50">
                             <code className="font-mono text-sm font-bold text-foreground select-all tracking-tight">
                                 {familiaId}
                             </code>
+                            <CopyCodeButton code={familiaId!} />
                         </div>
-                        <p className="text-[13px] font-medium text-muted-foreground mt-4 flex items-center gap-1.5">
+                        {/* Botón WhatsApp */}
+                        <a
+                            href={`https://wa.me/?text=${encodeURIComponent(
+                                `¡Hola! Te invito a unirte a nuestra familia en Finanzas App. 📲\n\n👉 Descarga la app en finanzas.ktuche.com\n🔑 Usa este código al registrarte como dependiente:\n\n*${familiaId}*\n\n¡Te espero!`
+                            )}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                        >
+                            <Button variant="outline" className="w-full gap-2 border-green-500/50 text-green-700 hover:bg-green-50 hover:text-green-800 dark:text-green-400 dark:hover:bg-green-950">
+                                <Share2Icon className="w-4 h-4" />
+                                Enviar invitación por WhatsApp
+                            </Button>
+                        </a>
+                        <p className="text-[13px] font-medium text-muted-foreground flex items-center gap-1.5">
                             <ShieldAlert className="w-4 h-4 text-amber-500" />
                             Límite de la cuenta: <strong className="text-foreground">{dependientesCount} / 5</strong> dependientes.
                         </p>

@@ -6,9 +6,19 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Label } from "@/components/ui/label"
 import { useState, use } from "react"
 import { BiometricLogin } from "@/components/auth/biometric-login"
+import Link from "next/link"
+import { CheckCircle2Icon, CircleIcon } from "lucide-react"
+
+const passwordRules = [
+    { key: "length", label: "Mínimo 8 caracteres", test: (p: string) => p.length >= 8 },
+    { key: "upper", label: "Letra mayúscula", test: (p: string) => /[A-Z]/.test(p) },
+    { key: "number", label: "Al menos un número", test: (p: string) => /[0-9]/.test(p) },
+    { key: "special", label: "Carácter especial (!@#$)", test: (p: string) => /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(p) },
+]
 
 export default function LoginPage({ searchParams }: { searchParams: Promise<{ error?: string }> }) {
     const [isDependent, setIsDependent] = useState(false)
+    const [signupPassword, setSignupPassword] = useState("")
     const resolvedParams = use(searchParams)
     const errorParam = resolvedParams?.error
 
@@ -39,7 +49,12 @@ export default function LoginPage({ searchParams }: { searchParams: Promise<{ er
                                 <Input id="email-login" name="email" type="email" placeholder="correo@ejemplo.com" required />
                             </div>
                             <div className="space-y-2">
-                                <Label htmlFor="password-login">Contraseña</Label>
+                                <div className="flex items-center justify-between">
+                                    <Label htmlFor="password-login">Contraseña</Label>
+                                    <Link href="/forgot-password" className="text-xs text-blue-600 hover:underline">
+                                        ¿Olvidaste tu contraseña?
+                                    </Link>
+                                </div>
                                 <Input id="password-login" name="password" type="password" required />
                             </div>
                             {errorParam && (
@@ -97,7 +112,32 @@ export default function LoginPage({ searchParams }: { searchParams: Promise<{ er
                             </div>
                             <div className="space-y-2">
                                 <Label htmlFor="password-signup">Contraseña</Label>
-                                <Input id="password-signup" name="password" type="password" required />
+                                <Input
+                                    id="password-signup"
+                                    name="password"
+                                    type="password"
+                                    placeholder="Mín. 8 caracteres"
+                                    value={signupPassword}
+                                    onChange={e => setSignupPassword(e.target.value)}
+                                    required
+                                />
+                                {/* Checklist de requisitos */}
+                                {signupPassword.length > 0 && (
+                                    <div className="mt-2 space-y-1.5 p-3 bg-muted rounded-lg">
+                                        {passwordRules.map(r => {
+                                            const ok = r.test(signupPassword)
+                                            return (
+                                                <div key={r.key} className={`flex items-center gap-2 text-xs transition-colors ${ok ? 'text-green-600' : 'text-muted-foreground'}`}>
+                                                    {ok
+                                                        ? <CheckCircle2Icon className="w-3.5 h-3.5 shrink-0" />
+                                                        : <CircleIcon className="w-3.5 h-3.5 shrink-0" />
+                                                    }
+                                                    {r.label}
+                                                </div>
+                                            )
+                                        })}
+                                    </div>
+                                )}
                             </div>
                         </CardContent>
                         <CardFooter>
