@@ -81,7 +81,7 @@ export function ClientTable({ transacciones, categoriasDisponibles }: ClientTabl
                         <TableHead className="font-semibold text-muted-foreground">Fecha</TableHead>
                         <TableHead className="font-semibold text-muted-foreground">Descripción</TableHead>
                         <TableHead className="font-semibold text-muted-foreground hidden md:table-cell">Categoría</TableHead>
-                        <TableHead className="font-semibold text-muted-foreground hidden lg:table-cell">Responsable</TableHead>
+                        <TableHead className="font-semibold text-muted-foreground">Responsable</TableHead>
                         <TableHead className="font-semibold text-muted-foreground">Monto</TableHead>
                         <TableHead className="font-semibold text-muted-foreground text-center">Estado</TableHead>
                         <TableHead className="font-semibold text-muted-foreground text-right">Acciones</TableHead>
@@ -122,8 +122,8 @@ export function ClientTable({ transacciones, categoriasDisponibles }: ClientTabl
                                     <TableCell className="hidden md:table-cell text-sm text-muted-foreground">
                                         <span className="bg-secondary px-2 py-1 rounded-md border border-border/50">{getCategoryWithEmoji(t.categoria)}</span>
                                     </TableCell>
-                                    <TableCell className="hidden lg:table-cell text-sm text-muted-foreground">
-                                        {t.perfiles?.nombre || 'Desconocido'}
+                                    <TableCell className="text-sm text-muted-foreground">
+                                        {t.perfiles?.nombre || '—'}
                                     </TableCell>
                                     <TableCell className={`font-bold tracking-tight ${isIncome ? 'text-emerald-600' : 'text-rose-600'}`}>
                                         {formatCOP(t.monto)}
