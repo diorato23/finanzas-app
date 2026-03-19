@@ -54,13 +54,13 @@ export function ClientTable({ transacciones, categoriasDisponibles }: ClientTabl
     }
 
     const handleDelete = async (id: string) => {
-        if (!confirm("Â¿Eliminar esta transacciÃ³n?")) return
+        if (!confirm("¿Eliminar esta transacción?")) return
         startTransition(async () => {
             const res = await deleteTransaccion(id)
             if (res?.error) {
                 toast.error(res.error)
             } else {
-                toast.success("TransacciÃ³n eliminada")
+                toast.success("Transacción eliminada")
             }
         })
     }
@@ -79,8 +79,8 @@ export function ClientTable({ transacciones, categoriasDisponibles }: ClientTabl
                 <TableHeader className="bg-muted/50">
                     <TableRow className="hover:bg-transparent">
                         <TableHead className="font-semibold text-muted-foreground">Fecha</TableHead>
-                        <TableHead className="font-semibold text-muted-foreground">DescripciÃ³n</TableHead>
-                        <TableHead className="font-semibold text-muted-foreground hidden md:table-cell">CategorÃ­a</TableHead>
+                        <TableHead className="font-semibold text-muted-foreground">Descripción</TableHead>
+                        <TableHead className="font-semibold text-muted-foreground hidden md:table-cell">Categoría</TableHead>
                         <TableHead className="font-semibold text-muted-foreground hidden lg:table-cell">Responsable</TableHead>
                         <TableHead className="font-semibold text-muted-foreground">Monto</TableHead>
                         <TableHead className="font-semibold text-muted-foreground text-center">Estado</TableHead>
@@ -155,7 +155,7 @@ export function ClientTable({ transacciones, categoriasDisponibles }: ClientTabl
                                                 onClick={() => handleDelete(t.id)}
                                                 disabled={isPending}
                                                 className="h-8 w-8 text-rose-500 hover:text-rose-700 hover:bg-rose-50" 
-                                                title="Eliminar TransacciÃ³n"
+                                                title="Eliminar Transacción"
                                             >
                                                 <TrashIcon className="w-4 h-4" />
                                                 <span className="sr-only">Eliminar</span>
