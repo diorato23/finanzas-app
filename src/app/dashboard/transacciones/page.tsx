@@ -10,7 +10,7 @@ export default async function TransaccionesPage() {
 
     const { data: transacciones, error } = await supabase
         .from("transacciones")
-        .select("*, perfiles(nombre)")
+        .select("*, perfiles!user_id(nombre)")
         .order("created_at", { ascending: false })
 
     // Cargar categorías dinámicas del banco
