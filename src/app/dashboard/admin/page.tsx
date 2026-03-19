@@ -66,7 +66,7 @@ export default async function FamiliaPage() {
                         {/* Botón WhatsApp */}
                         <a
                             href={`https://wa.me/?text=${encodeURIComponent(
-                                `¡Hola! Te invito a unirte a nuestra familia en Finanzas App. 📲\n\n👉 Descarga la app en finanzas.ktuche.com\n🔑 Usa este código al registrarte como dependiente:\n\n*${familiaId}*\n\n¡Te espero!`
+                                `¡Hola! Te invito a unirte a nuestra familia en Bolsillo App. 📲\n\n👉 Accede aquí: bolsillo.ktuche.com\n\n🔑 Tu código de invitación:\n\n${familiaId}\n\n📋 Copia solo el código de arriba y pégalo al registrarte como dependiente.\n\n¡Te espero!`
                             )}`}
                             target="_blank"
                             rel="noopener noreferrer"

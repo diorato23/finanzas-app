@@ -39,10 +39,10 @@ export async function generarInforme(formData: FormData) {
     const isAdmin = perfil.rol === 'admin' || perfil.rol === 'co_admin'
     let query = supabase
         .from("transacciones")
-        .select("tipo, monto, fecha_vencimiento, categoria")
+        .select("tipo, monto, created_at, categoria")
         .eq("familia_id", perfil.familia_id)
-        .gte("fecha_vencimiento", fechaInicio)
-        .lte("fecha_vencimiento", fechaFin)
+        .gte("created_at", `${fechaInicio}T00:00:00`)
+        .lte("created_at", `${fechaFin}T23:59:59`)
 
     if (!isAdmin) {
         query = query.eq("user_id", user.id)
@@ -63,7 +63,7 @@ export async function generarInforme(formData: FormData) {
 
     if (transacciones) {
         transacciones.forEach(t => {
-            const date = new Date(t.fecha_vencimiento)
+            const date = new Date(t.created_at)
             const amount = Number(t.monto)
 
             let key = ""
