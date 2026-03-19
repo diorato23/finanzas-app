@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { authenticateWebhook, parseBody } from "../lib/auth";
 import type { SupabaseClient } from "@supabase/supabase-js";
+import { revalidatePath } from "next/cache";
 
 export const dynamic = "force-dynamic";
 
@@ -93,6 +94,8 @@ async function crearTransaccion(
     }
 
     const tipoEmoji = tipo === "cobro" ? "📈" : "📉";
+
+    revalidatePath("/dashboard", "layout");
 
     return NextResponse.json({
         success: true,
@@ -198,6 +201,8 @@ async function eliminarTransaccion(
         }, { status: 409 });
     }
 
+    revalidatePath("/dashboard", "layout");
+
     return NextResponse.json({
         success: true,
         message: `🗑️ *He eliminado la transacción:* "${existing.descripcion}" de $${Number(existing.monto).toLocaleString("es-CO")}.`
@@ -255,6 +260,8 @@ async function editarTransaccion(
     if (error) {
         return NextResponse.json({ error: "Error al editar la transacción", detalle: error.message }, { status: 500 });
     }
+
+    revalidatePath("/dashboard", "layout");
 
     return NextResponse.json({
         success: true,
