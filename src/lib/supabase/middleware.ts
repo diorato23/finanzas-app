@@ -34,8 +34,13 @@ export async function updateSession(request: NextRequest) {
     // Protect all non-public routes here
     const isAuthRoute = request.nextUrl.pathname.startsWith('/login') || request.nextUrl.pathname.startsWith('/register')
     const isApiRoute = request.nextUrl.pathname.startsWith('/api')
+    // Rotas públicas: recuperação de senha e callback do Supabase
+    const isPublicRoute = 
+        request.nextUrl.pathname.startsWith('/forgot-password') ||
+        request.nextUrl.pathname.startsWith('/reset-password') ||
+        request.nextUrl.pathname.startsWith('/auth/callback')
     
-    if (!user && !isAuthRoute && !isApiRoute && request.nextUrl.pathname !== '/') {
+    if (!user && !isAuthRoute && !isApiRoute && !isPublicRoute && request.nextUrl.pathname !== '/') {
         // If no user and trying to access protected route and it is not an API route
         const url = request.nextUrl.clone()
         url.pathname = '/login'
