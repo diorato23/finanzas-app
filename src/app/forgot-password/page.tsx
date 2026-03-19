@@ -27,7 +27,11 @@ export default function ForgotPasswordPage() {
         const { error } = await supabase.auth.resetPasswordForEmail(email, { redirectTo })
 
         if (error) {
-            setError("No encontramos una cuenta con ese correo. Verifica e intenta de nuevo.")
+            if (error.status === 429) {
+                setError("Has solicitado demasiados enlaces de recuperación. Por favor, espera unos minutos e intenta de nuevo.")
+            } else {
+                setError("No encontramos una cuenta con ese correo. Verifica e intenta de nuevo.")
+            }
         } else {
             setSent(true)
         }
