@@ -69,8 +69,8 @@ export default async function PresupuestosPage({ searchParams }: { searchParams:
         .select("categoria, monto")
         .eq("familia_id", familiaId)
         .eq("tipo", "pago")
-        .gte("fecha_vencimiento", startDate)
-        .lte("fecha_vencimiento", endDate)
+        .gte("created_at", startDate)
+        .lte("created_at", endDate)
 
     // Agregar Gastos por Categoria
     const gastosPorCategoria: Record<string, number> = {}
