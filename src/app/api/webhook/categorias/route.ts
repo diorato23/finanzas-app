@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { authenticateWebhook, parseBody } from "../lib/auth";
 import type { SupabaseClient } from "@supabase/supabase-js";
+import { revalidatePath } from "next/cache";
 
 export const dynamic = "force-dynamic";
 
@@ -87,6 +88,8 @@ async function crearCategoria(
         return NextResponse.json({ error: "Error al crear categoría", detalle: error.message }, { status: 500 });
     }
 
+    revalidatePath("/dashboard", "layout");
+
     return NextResponse.json({
         success: true,
         message: `📁 Categoría "${nombre}" creada correctamente`
@@ -129,6 +132,8 @@ async function eliminarCategoria(
     if (error) {
         return NextResponse.json({ error: "Error al eliminar", detalle: error.message }, { status: 500 });
     }
+
+    revalidatePath("/dashboard", "layout");
 
     return NextResponse.json({
         success: true,

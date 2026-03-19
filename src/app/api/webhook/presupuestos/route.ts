@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { authenticateWebhook, parseBody } from "../lib/auth";
 import type { SupabaseClient } from "@supabase/supabase-js";
+import { revalidatePath } from "next/cache";
 
 export const dynamic = "force-dynamic";
 
@@ -84,6 +85,8 @@ async function definirPresupuesto(
     }
 
     const fmt = (n: number) => `$${n.toLocaleString("es-CO")}`;
+
+    revalidatePath("/dashboard", "layout");
 
     return NextResponse.json({
         success: true,
@@ -190,6 +193,8 @@ async function eliminarPresupuesto(
     if (error) {
         return NextResponse.json({ error: "Error al eliminar presupuesto", detalle: error.message }, { status: 500 });
     }
+
+    revalidatePath("/dashboard", "layout");
 
     return NextResponse.json({
         success: true,
