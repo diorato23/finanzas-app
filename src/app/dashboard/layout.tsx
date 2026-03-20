@@ -80,9 +80,22 @@ export default async function DashboardLayout({
             <SidebarProvider>
                 <AppSidebar />
 
-                <div className="flex flex-1 flex-col min-h-screen min-w-0 bg-background overflow-hidden relative pb-[72px] md:pb-0">
-                    {/* Header Superior */}
-                    <header className="print:hidden flex items-center justify-between px-4 sm:px-8 py-4 bg-card border-b border-border/50 shrink-0 h-[70px]">
+                <div className="flex flex-1 flex-col min-h-screen min-w-0 overflow-hidden relative pb-[72px] md:pb-0"
+                    style={{
+                        background: "linear-gradient(160deg, #f0f1f5 0%, #ede9fe 50%, #e0e7ff 100%)"
+                    }}
+                >
+                    <style>{`.dark .dashboard-bg { background: linear-gradient(160deg, #0f172a 0%, #1a1040 50%, #1e1b4b 100%) !important; }`}</style>
+                    {/* Header Superior — glassmorphism sticky */}
+                    <header data-glass className="print:hidden sticky top-0 z-40 flex items-center justify-between px-4 sm:px-8 py-4 shrink-0 h-[70px]"
+                        style={{
+                            background: "rgba(255,255,255,0.65)",
+                            backdropFilter: "blur(20px)",
+                            WebkitBackdropFilter: "blur(20px)",
+                            borderBottom: "1px solid rgba(79,70,229,0.12)",
+                            boxShadow: "0 1px 24px 0 rgba(79,70,229,0.06)"
+                        }}
+                    >
                         <div className="flex items-center gap-3">
                             <SidebarTrigger className="md:hidden" />
                             <h1 className="text-xl font-bold tracking-tight text-foreground">

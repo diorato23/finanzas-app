@@ -136,3 +136,16 @@
     @apply bg-background text-foreground;
   }
 }
+
+/* ── Glassmorphism dark mode overrides ── */
+.dark header[data-glass] {
+  background: rgba(15, 23, 42, 0.70) !important;
+  border-bottom-color: rgba(129, 140, 248, 0.15) !important;
+  box-shadow: 0 1px 24px 0 rgba(79, 70, 229, 0.10) !important;
+}
+
+.dark nav[data-glass] {
+  background: rgba(15, 23, 42, 0.75) !important;
+  border-top-color: rgba(129, 140, 248, 0.15) !important;
+  box-shadow: 0 -1px 24px 0 rgba(79, 70, 229, 0.10) !important;
+}

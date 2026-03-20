@@ -49,7 +49,15 @@ export function AppBottomNav({ isAdmin, hasFamily }: { isAdmin: boolean, hasFami
     ]
 
     return (
-        <nav className="md:hidden fixed bottom-0 left-0 right-0 h-[72px] bg-card border-t border-border-light flex items-center justify-around px-2 z-50 pb-safe">
+        <nav data-glass className="md:hidden fixed bottom-0 left-0 right-0 h-[72px] flex items-center justify-around px-2 z-50 pb-safe"
+            style={{
+                background: "rgba(255,255,255,0.75)",
+                backdropFilter: "blur(20px)",
+                WebkitBackdropFilter: "blur(20px)",
+                borderTop: "1px solid rgba(79,70,229,0.12)",
+                boxShadow: "0 -1px 24px 0 rgba(79,70,229,0.06)"
+            }}
+        >
             {navItems.map((item) => {
                 const isActive = pathname === item.url
                 const Icon = item.icon
