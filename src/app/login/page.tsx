@@ -221,19 +221,17 @@ export default function LoginPage({ searchParams }: { searchParams: Promise<{ er
                                     style={{ background: "rgba(255,255,255,0.08)" }}
                                 />
                             </div>
-                            {signupPassword.length > 0 && (
-                                <div className="mt-1.5 space-y-1 p-2.5 rounded-xl" style={{ background: "rgba(255,255,255,0.05)" }}>
+                            <div className="mt-1.5 space-y-1 p-2.5 rounded-xl" style={{ background: "rgba(255,255,255,0.05)" }}>
                                     {passwordRules.map(r => {
                                         const ok = r.test(signupPassword)
                                         return (
-                                            <div key={r.key} className={`flex items-center gap-1.5 text-xs transition-colors ${ok ? 'text-emerald-400' : 'text-white/30'}`}>
+                                            <div key={r.key} className={`flex items-center gap-1.5 text-xs transition-all duration-300 ${ok ? 'text-emerald-400' : 'text-white/30'}`}>
                                                 {ok ? <CheckCircle2Icon className="w-3 h-3 shrink-0" /> : <CircleIcon className="w-3 h-3 shrink-0" />}
                                                 {r.label}
                                             </div>
                                         )
                                     })}
                                 </div>
-                            )}
                         </div>
 
                         <button
