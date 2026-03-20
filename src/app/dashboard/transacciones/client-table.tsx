@@ -66,12 +66,12 @@ export function ClientTable({ transacciones, categoriasDisponibles }: ClientTabl
             <Table className="table-fixed w-full">
                 <TableHeader className="bg-muted/50">
                     <TableRow className="hover:bg-transparent">
-                        <TableHead className="font-semibold text-muted-foreground text-xs uppercase tracking-wider w-[70px]">Fecha</TableHead>
+                        <TableHead className="font-semibold text-muted-foreground text-xs uppercase tracking-wider w-[58px]">Fecha</TableHead>
                         <TableHead className="font-semibold text-muted-foreground text-xs uppercase tracking-wider">Descripción</TableHead>
-                        <TableHead className="font-semibold text-muted-foreground text-xs uppercase tracking-wider hidden md:table-cell w-[140px]">Categoría</TableHead>
-                        <TableHead className="font-semibold text-muted-foreground text-xs uppercase tracking-wider hidden sm:table-cell w-[110px]">Responsable</TableHead>
-                        <TableHead className="font-semibold text-muted-foreground text-xs uppercase tracking-wider text-right w-[110px]">Monto</TableHead>
-                        <TableHead className="font-semibold text-muted-foreground text-xs uppercase tracking-wider text-right w-[80px]">Acciones</TableHead>
+                        <TableHead className="font-semibold text-muted-foreground text-xs uppercase tracking-wider hidden lg:table-cell w-[130px]">Categoría</TableHead>
+                        <TableHead className="font-semibold text-muted-foreground text-xs uppercase tracking-wider hidden lg:table-cell w-[110px]">Responsable</TableHead>
+                        <TableHead className="font-semibold text-muted-foreground text-xs uppercase tracking-wider text-right w-[105px]">Monto</TableHead>
+                        <TableHead className="font-semibold text-muted-foreground text-xs uppercase tracking-wider text-right w-[72px]">Acciones</TableHead>
                     </TableRow>
                 </TableHeader>
                 <TableBody className="relative">
@@ -110,16 +110,21 @@ export function ClientTable({ transacciones, categoriasDisponibles }: ClientTabl
                                             </div>
                                             <div className="min-w-0">
                                                 <p className="font-medium text-sm truncate">{t.descripcion}</p>
-                                                <p className="md:hidden text-xs text-muted-foreground truncate">
-                                                    {getCategoryWithEmoji(t.categoria)}
-                                                </p>
+                                                {/* Mobile: mostra categoria + responsável abaixo da descrição */}
+                                                <div className="lg:hidden flex items-center gap-1.5 mt-0.5 flex-wrap">
+                                                    <span className="text-xs bg-secondary px-1.5 py-0.5 rounded border border-border/50 text-muted-foreground">{getCategoryWithEmoji(t.categoria)}</span>
+                                                    {t.perfiles?.nombre && (
+                                                        <span className="text-xs text-muted-foreground/70">· {t.perfiles.nombre}</span>
+                                                    )}
+                                                </div>
                                             </div>
                                         </div>
                                     </TableCell>
-                                    <TableCell className="hidden md:table-cell py-3 px-3">
+                                    {/* Desktop: colunas separadas */}
+                                    <TableCell className="hidden lg:table-cell py-3 px-3">
                                         <span className="text-xs bg-secondary px-2 py-0.5 rounded-full border border-border/50 text-muted-foreground">{getCategoryWithEmoji(t.categoria)}</span>
                                     </TableCell>
-                                    <TableCell className="hidden sm:table-cell py-3 px-3 text-xs text-muted-foreground truncate">
+                                    <TableCell className="hidden lg:table-cell py-3 px-3 text-xs text-muted-foreground truncate">
                                         {t.perfiles?.nombre || '—'}
                                     </TableCell>
                                     <TableCell className={`py-3 px-3 text-right font-bold text-sm tabular-nums ${isIncome ? 'text-emerald-600' : 'text-rose-500'}`}>
