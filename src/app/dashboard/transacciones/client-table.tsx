@@ -2,9 +2,8 @@
 
 import { motion, AnimatePresence } from "framer-motion"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
-import { TrashIcon } from "lucide-react"
+import { TrashIcon, TrendingUp, TrendingDown } from "lucide-react"
 import { EditTransactionSheet } from "./edit-sheet"
 import { getCategoryWithEmoji } from "@/lib/utils"
 import { deleteTransaccion } from "./actions"
@@ -42,8 +41,6 @@ export function ClientTable({ transacciones, categoriasDisponibles }: ClientTabl
     const [isPending, startTransition] = useTransition()
     const router = useRouter()
 
-
-
     const handleDelete = async (id: string) => {
         if (!confirm("¿Eliminar esta transacción?")) return
         startTransition(async () => {
@@ -66,16 +63,15 @@ export function ClientTable({ transacciones, categoriasDisponibles }: ClientTabl
 
     return (
         <div className="overflow-x-auto">
-            <Table>
+            <Table className="table-fixed w-full">
                 <TableHeader className="bg-muted/50">
                     <TableRow className="hover:bg-transparent">
-                        <TableHead className="font-semibold text-muted-foreground">Fecha</TableHead>
-                        <TableHead className="font-semibold text-muted-foreground">Descripción</TableHead>
-                        <TableHead className="font-semibold text-muted-foreground hidden md:table-cell">Categoría</TableHead>
-                        <TableHead className="font-semibold text-muted-foreground">Responsable</TableHead>
-                        <TableHead className="font-semibold text-muted-foreground">Monto</TableHead>
-
-                        <TableHead className="font-semibold text-muted-foreground text-right">Acciones</TableHead>
+                        <TableHead className="font-semibold text-muted-foreground text-xs uppercase tracking-wider w-[70px]">Fecha</TableHead>
+                        <TableHead className="font-semibold text-muted-foreground text-xs uppercase tracking-wider">Descripción</TableHead>
+                        <TableHead className="font-semibold text-muted-foreground text-xs uppercase tracking-wider hidden md:table-cell w-[140px]">Categoría</TableHead>
+                        <TableHead className="font-semibold text-muted-foreground text-xs uppercase tracking-wider hidden sm:table-cell w-[110px]">Responsable</TableHead>
+                        <TableHead className="font-semibold text-muted-foreground text-xs uppercase tracking-wider text-right w-[110px]">Monto</TableHead>
+                        <TableHead className="font-semibold text-muted-foreground text-xs uppercase tracking-wider text-right w-[80px]">Acciones</TableHead>
                     </TableRow>
                 </TableHeader>
                 <TableBody className="relative">
@@ -97,42 +93,50 @@ export function ClientTable({ transacciones, categoriasDisponibles }: ClientTabl
                                     }}
                                     className="group border-b transition-colors hover:bg-accent/30 data-[state=selected]:bg-muted"
                                 >
-                                    <TableCell>
+                                    <TableCell className="py-3 px-3">
                                         <SafeDate>
-                                            <div className="text-sm font-medium">
+                                            <div className="text-xs font-medium text-muted-foreground">
                                                 {new Intl.DateTimeFormat('es-CO', { day: '2-digit', month: 'short' }).format(new Date(t.created_at))}
                                             </div>
                                         </SafeDate>
                                     </TableCell>
-                                    <TableCell className="font-medium">
-                                        {t.descripcion}
-                                        <div className="md:hidden text-xs text-muted-foreground mt-0.5">
-                                            {getCategoryWithEmoji(t.categoria)}
+                                    <TableCell className="py-3 px-3">
+                                        <div className="flex items-center gap-2">
+                                            <div className={`shrink-0 w-7 h-7 rounded-full flex items-center justify-center ${isIncome ? 'bg-emerald-100 dark:bg-emerald-900/30' : 'bg-rose-100 dark:bg-rose-900/30'}`}>
+                                                {isIncome 
+                                                    ? <TrendingUp className="w-3.5 h-3.5 text-emerald-600" /> 
+                                                    : <TrendingDown className="w-3.5 h-3.5 text-rose-500" />
+                                                }
+                                            </div>
+                                            <div className="min-w-0">
+                                                <p className="font-medium text-sm truncate">{t.descripcion}</p>
+                                                <p className="md:hidden text-xs text-muted-foreground truncate">
+                                                    {getCategoryWithEmoji(t.categoria)}
+                                                </p>
+                                            </div>
                                         </div>
                                     </TableCell>
-                                    <TableCell className="hidden md:table-cell text-sm text-muted-foreground">
-                                        <span className="bg-secondary px-2 py-1 rounded-md border border-border/50">{getCategoryWithEmoji(t.categoria)}</span>
+                                    <TableCell className="hidden md:table-cell py-3 px-3">
+                                        <span className="text-xs bg-secondary px-2 py-0.5 rounded-full border border-border/50 text-muted-foreground">{getCategoryWithEmoji(t.categoria)}</span>
                                     </TableCell>
-                                    <TableCell className="text-sm text-muted-foreground">
+                                    <TableCell className="hidden sm:table-cell py-3 px-3 text-xs text-muted-foreground truncate">
                                         {t.perfiles?.nombre || '—'}
                                     </TableCell>
-                                    <TableCell className={`font-bold tracking-tight ${isIncome ? 'text-emerald-600' : 'text-rose-600'}`}>
+                                    <TableCell className={`py-3 px-3 text-right font-bold text-sm tabular-nums ${isIncome ? 'text-emerald-600' : 'text-rose-500'}`}>
                                         {formatCOP(t.monto)}
                                     </TableCell>
-
-                                    <TableCell className="text-right space-x-2">
-                                        <div className="flex items-center justify-end gap-2 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity">
-
+                                    <TableCell className="py-3 px-3 text-right">
+                                        <div className="flex items-center justify-end gap-1 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity">
                                             <EditTransactionSheet transaccion={t} categoriasDisponibles={categoriasDisponibles} />
                                             <Button 
                                                 variant="ghost" 
                                                 size="icon" 
                                                 onClick={() => handleDelete(t.id)}
                                                 disabled={isPending}
-                                                className="h-8 w-8 text-rose-500 hover:text-rose-700 hover:bg-rose-50" 
+                                                className="h-7 w-7 text-rose-500 hover:text-rose-700 hover:bg-rose-50 dark:hover:bg-rose-900/20" 
                                                 title="Eliminar Transacción"
                                             >
-                                                <TrashIcon className="w-4 h-4" />
+                                                <TrashIcon className="w-3.5 h-3.5" />
                                                 <span className="sr-only">Eliminar</span>
                                             </Button>
                                         </div>
