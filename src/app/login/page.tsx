@@ -2,12 +2,11 @@
 import { login, signup } from "./actions"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Label } from "@/components/ui/label"
 import { useState, use } from "react"
 import { BiometricLogin } from "@/components/auth/biometric-login"
 import Link from "next/link"
-import { CheckCircle2Icon, CircleIcon } from "lucide-react"
+import { CheckCircle2Icon, CircleIcon, WalletIcon, UserIcon, LockIcon, MailIcon, PhoneIcon } from "lucide-react"
 
 const passwordRules = [
     { key: "length", label: "Mínimo 8 caracteres", test: (p: string) => p.length >= 8 },
@@ -16,102 +15,200 @@ const passwordRules = [
     { key: "special", label: "Carácter especial (!@#$)", test: (p: string) => /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(p) },
 ]
 
-export default function LoginPage({ searchParams }: { searchParams: Promise<{ error?: string }> }) {
-    const [isDependent, setIsDependent] = useState(false)
-    const [signupPassword, setSignupPassword] = useState("")
+export default function LoginPage({ searchParams }: { searchParams: Promise<{ error?: string, tab?: string }> }) {
     const resolvedParams = use(searchParams)
     const errorParam = resolvedParams?.error
+    const [tab, setTab] = useState<"login" | "signup">(resolvedParams?.tab === "signup" ? "signup" : "login")
+    const [isDependent, setIsDependent] = useState(false)
+    const [signupPassword, setSignupPassword] = useState("")
 
     return (
-        <div className="flex min-h-screen w-full items-center justify-center p-4 bg-slate-50 dark:bg-slate-900">
-            <div className="flex flex-col md:flex-row gap-6 w-full max-w-5xl items-start">
-                {/* LOGIN */}
-                <Card className="flex-1 w-full shrink-0">
-                    <CardHeader>
-                        <CardTitle>Iniciar Sesión</CardTitle>
-                        <CardDescription>Accede a tu cuenta de Finanzas.</CardDescription>
-                    </CardHeader>
-                    <div className="px-6 pb-2">
-                        <BiometricLogin />
-                        <div className="relative my-6">
-                            <div className="absolute inset-0 flex items-center">
-                                <span className="w-full border-t border-muted-foreground/20" />
-                            </div>
-                            <div className="relative flex justify-center text-xs uppercase">
-                                <span className="bg-background px-2 text-muted-foreground">O usa tu contraseña</span>
-                            </div>
-                        </div>
+        <div className="min-h-screen w-full flex items-center justify-center p-4" style={{
+            background: "linear-gradient(135deg, #1a1040 0%, #2d1b69 40%, #1e3a8a 100%)"
+        }}>
+            {/* Card glassmorphism */}
+            <div className="w-full max-w-sm rounded-3xl p-6 shadow-2xl" style={{
+                background: "rgba(255,255,255,0.07)",
+                backdropFilter: "blur(24px)",
+                border: "1px solid rgba(255,255,255,0.12)"
+            }}>
+                {/* Logo */}
+                <div className="flex items-center gap-3 mb-6">
+                    <div className="w-11 h-11 rounded-2xl bg-indigo-500 flex items-center justify-center shadow-lg shadow-indigo-500/30">
+                        <WalletIcon className="w-6 h-6 text-white" />
                     </div>
-                    <form action={login}>
-                        <CardContent className="space-y-4">
-                            <div className="space-y-2">
-                                <Label htmlFor="email-login">Correo Electrónico</Label>
-                                <Input id="email-login" name="email" type="email" placeholder="correo@ejemplo.com" required />
+                    <span className="text-2xl font-bold text-white tracking-tight">Bolsillo</span>
+                </div>
+
+                {/* Tabs */}
+                <div className="flex rounded-2xl p-1 mb-6" style={{ background: "rgba(255,255,255,0.08)" }}>
+                    <button
+                        type="button"
+                        onClick={() => setTab("login")}
+                        className={`flex-1 py-2 rounded-xl text-sm font-semibold transition-all duration-200 ${
+                            tab === "login"
+                                ? "bg-indigo-600 text-white shadow-md shadow-indigo-900/40"
+                                : "text-white/50 hover:text-white/80"
+                        }`}
+                    >
+                        Ingresar
+                    </button>
+                    <button
+                        type="button"
+                        onClick={() => setTab("signup")}
+                        className={`flex-1 py-2 rounded-xl text-sm font-semibold transition-all duration-200 ${
+                            tab === "signup"
+                                ? "bg-indigo-600 text-white shadow-md shadow-indigo-900/40"
+                                : "text-white/50 hover:text-white/80"
+                        }`}
+                    >
+                        Crear Cuenta
+                    </button>
+                </div>
+
+                {/* ── LOGIN FORM ── */}
+                {tab === "login" && (
+                    <div className="space-y-4">
+                        <BiometricLogin />
+                        <form action={login} className="space-y-4">
+                            <div className="space-y-1.5">
+                                <Label className="text-xs font-semibold text-white/50 uppercase tracking-widest">Correo</Label>
+                                <div className="relative">
+                                    <MailIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/30" />
+                                    <Input
+                                        name="email"
+                                        type="email"
+                                        placeholder="correo@ejemplo.com"
+                                        required
+                                        className="pl-10 rounded-xl border-0 text-white placeholder:text-white/25 h-11"
+                                        style={{ background: "rgba(255,255,255,0.08)" }}
+                                    />
+                                </div>
                             </div>
-                            <div className="space-y-2">
-                                <div className="flex items-center justify-between">
-                                    <Label htmlFor="password-login">Contraseña</Label>
-                                    <Link href="/forgot-password" className="text-xs text-blue-600 hover:underline">
+                            <div className="space-y-1.5">
+                                <Label className="text-xs font-semibold text-white/50 uppercase tracking-widest">Contraseña</Label>
+                                <div className="relative">
+                                    <LockIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/30" />
+                                    <Input
+                                        name="password"
+                                        type="password"
+                                        placeholder="••••••••"
+                                        required
+                                        className="pl-10 rounded-xl border-0 text-white placeholder:text-white/25 h-11"
+                                        style={{ background: "rgba(255,255,255,0.08)" }}
+                                    />
+                                </div>
+                                <div className="text-right">
+                                    <Link href="/forgot-password" className="text-xs text-indigo-300 hover:text-indigo-200 transition-colors">
                                         ¿Olvidaste tu contraseña?
                                     </Link>
                                 </div>
-                                <Input id="password-login" name="password" type="password" required />
                             </div>
                             {errorParam && (
-                                <div className="text-sm font-medium text-red-500 bg-red-50 p-2 rounded">{errorParam}</div>
+                                <div className="text-xs font-medium text-rose-300 bg-rose-900/30 border border-rose-500/30 px-3 py-2 rounded-xl">{errorParam}</div>
                             )}
-                        </CardContent>
-                        <CardFooter>
-                            <Button type="submit" className="w-full">Ingresar</Button>
-                        </CardFooter>
-                    </form>
-                </Card>
-
-                {/* REGISTRO */}
-                <Card className="flex-1 w-full shrink-0">
-                    <CardHeader>
-                        <CardTitle>Crear Cuenta Nueva</CardTitle>
-                        <CardDescription>
-                            Regístrate para manejar tus finanzas.
-                            <button
-                                type="button"
-                                onClick={() => setIsDependent(!isDependent)}
-                                className="block mt-2 text-sm text-blue-600 hover:underline"
+                            <Button
+                                type="submit"
+                                className="w-full h-11 rounded-xl font-bold text-white bg-indigo-600 hover:bg-indigo-500 shadow-lg shadow-indigo-900/40 border-0 mt-2 transition-all"
                             >
-                                {isDependent ? "¿Eres el titular administrador? Haz clic aquí." : "¿Te invitaron como dependiente? Haz clic aquí."}
+                                Ingresar
+                            </Button>
+                        </form>
+                        <p className="text-center text-xs text-white/40 pt-1">
+                            ¿No tienes cuenta?{" "}
+                            <button onClick={() => setTab("signup")} className="text-indigo-300 font-semibold hover:text-indigo-200">
+                                Crear Cuenta
                             </button>
-                        </CardDescription>
-                    </CardHeader>
-                    <form action={signup}>
-                        <CardContent className="space-y-4">
-                            <div className="space-y-2">
-                                <Label htmlFor="nombre">Tu Nombre</Label>
-                                <Input id="nombre" name="nombre" placeholder="José Pérez" required />
-                            </div>
+                        </p>
+                    </div>
+                )}
 
-                            {!isDependent ? (
-                                <div className="space-y-2">
-                                    <Label htmlFor="familia">Nombre de la Familia (Titular)</Label>
-                                    <Input id="familia" name="familia" placeholder="Familia Pérez" required />
-                                </div>
-                            ) : (
-                                <div className="space-y-2">
-                                    <Label htmlFor="codigo_familia">Código de Familia (Invitación)</Label>
-                                    <Input id="codigo_familia" name="codigo_familia" placeholder="Copia y pega el ID de familia" required />
-                                </div>
-                            )}
+                {/* ── SIGNUP FORM ── */}
+                {tab === "signup" && (
+                    <form action={signup} className="space-y-3">
+                        <div className="space-y-1.5">
+                            <Label className="text-xs font-semibold text-white/50 uppercase tracking-widest">Tu Nombre</Label>
+                            <div className="relative">
+                                <UserIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/30" />
+                                <Input
+                                    id="nombre"
+                                    name="nombre"
+                                    placeholder="José Pérez"
+                                    required
+                                    className="pl-10 rounded-xl border-0 text-white placeholder:text-white/25 h-11"
+                                    style={{ background: "rgba(255,255,255,0.08)" }}
+                                />
+                            </div>
+                        </div>
 
-                            <div className="space-y-2">
-                                <Label htmlFor="email-signup">Correo Electrónico</Label>
-                                <Input id="email-signup" name="email" type="email" placeholder="correo@ejemplo.com" required />
+                        {!isDependent ? (
+                            <div className="space-y-1.5">
+                                <Label className="text-xs font-semibold text-white/50 uppercase tracking-widest">Nombre de Familia</Label>
+                                <div className="relative">
+                                    <UserIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/30" />
+                                    <Input
+                                        id="familia"
+                                        name="familia"
+                                        placeholder="Familia Pérez"
+                                        required
+                                        className="pl-10 rounded-xl border-0 text-white placeholder:text-white/25 h-11"
+                                        style={{ background: "rgba(255,255,255,0.08)" }}
+                                    />
+                                </div>
                             </div>
-                            <div className="space-y-2">
-                                <Label htmlFor="whatsapp">WhatsApp (Para el Bot)</Label>
-                                <Input id="whatsapp" name="whatsapp" type="tel" placeholder="Ej: 573001234567" required />
-                                <p className="text-[0.8rem] text-muted-foreground">Incluye el código de país sin el &apos;+&apos;.</p>
+                        ) : (
+                            <div className="space-y-1.5">
+                                <Label className="text-xs font-semibold text-white/50 uppercase tracking-widest">Código de Familia</Label>
+                                <div className="relative">
+                                    <UserIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/30" />
+                                    <Input
+                                        id="codigo_familia"
+                                        name="codigo_familia"
+                                        placeholder="Pega el ID de familia"
+                                        required
+                                        className="pl-10 rounded-xl border-0 text-white placeholder:text-white/25 h-11"
+                                        style={{ background: "rgba(255,255,255,0.08)" }}
+                                    />
+                                </div>
                             </div>
-                            <div className="space-y-2">
-                                <Label htmlFor="password-signup">Contraseña</Label>
+                        )}
+
+                        <div className="space-y-1.5">
+                            <Label className="text-xs font-semibold text-white/50 uppercase tracking-widest">Correo</Label>
+                            <div className="relative">
+                                <MailIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/30" />
+                                <Input
+                                    id="email-signup"
+                                    name="email"
+                                    type="email"
+                                    placeholder="correo@ejemplo.com"
+                                    required
+                                    className="pl-10 rounded-xl border-0 text-white placeholder:text-white/25 h-11"
+                                    style={{ background: "rgba(255,255,255,0.08)" }}
+                                />
+                            </div>
+                        </div>
+
+                        <div className="space-y-1.5">
+                            <Label className="text-xs font-semibold text-white/50 uppercase tracking-widest">WhatsApp</Label>
+                            <div className="relative">
+                                <PhoneIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/30" />
+                                <Input
+                                    id="whatsapp"
+                                    name="whatsapp"
+                                    type="tel"
+                                    placeholder="573001234567"
+                                    required
+                                    className="pl-10 rounded-xl border-0 text-white placeholder:text-white/25 h-11"
+                                    style={{ background: "rgba(255,255,255,0.08)" }}
+                                />
+                            </div>
+                        </div>
+
+                        <div className="space-y-1.5">
+                            <Label className="text-xs font-semibold text-white/50 uppercase tracking-widest">Contraseña</Label>
+                            <div className="relative">
+                                <LockIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/30" />
                                 <Input
                                     id="password-signup"
                                     name="password"
@@ -120,33 +217,50 @@ export default function LoginPage({ searchParams }: { searchParams: Promise<{ er
                                     value={signupPassword}
                                     onChange={e => setSignupPassword(e.target.value)}
                                     required
+                                    className="pl-10 rounded-xl border-0 text-white placeholder:text-white/25 h-11"
+                                    style={{ background: "rgba(255,255,255,0.08)" }}
                                 />
-                                {/* Checklist de requisitos */}
-                                {signupPassword.length > 0 && (
-                                    <div className="mt-2 space-y-1.5 p-3 bg-muted rounded-lg">
-                                        {passwordRules.map(r => {
-                                            const ok = r.test(signupPassword)
-                                            return (
-                                                <div key={r.key} className={`flex items-center gap-2 text-xs transition-colors ${ok ? 'text-green-600' : 'text-muted-foreground'}`}>
-                                                    {ok
-                                                        ? <CheckCircle2Icon className="w-3.5 h-3.5 shrink-0" />
-                                                        : <CircleIcon className="w-3.5 h-3.5 shrink-0" />
-                                                    }
-                                                    {r.label}
-                                                </div>
-                                            )
-                                        })}
-                                    </div>
-                                )}
                             </div>
-                        </CardContent>
-                        <CardFooter>
-                            <Button type="submit" variant={isDependent ? "outline" : "secondary"} className="w-full">
-                                {isDependent ? "Registrar como Dependiente" : "Crear Grupo Familiar"}
-                            </Button>
-                        </CardFooter>
+                            {signupPassword.length > 0 && (
+                                <div className="mt-1.5 space-y-1 p-2.5 rounded-xl" style={{ background: "rgba(255,255,255,0.05)" }}>
+                                    {passwordRules.map(r => {
+                                        const ok = r.test(signupPassword)
+                                        return (
+                                            <div key={r.key} className={`flex items-center gap-1.5 text-xs transition-colors ${ok ? 'text-emerald-400' : 'text-white/30'}`}>
+                                                {ok ? <CheckCircle2Icon className="w-3 h-3 shrink-0" /> : <CircleIcon className="w-3 h-3 shrink-0" />}
+                                                {r.label}
+                                            </div>
+                                        )
+                                    })}
+                                </div>
+                            )}
+                        </div>
+
+                        <button
+                            type="button"
+                            onClick={() => setIsDependent(!isDependent)}
+                            className="text-xs text-indigo-300 hover:text-indigo-200 w-full text-center pt-0.5"
+                        >
+                            {isDependent ? "¿Eres titular? Haz clic aquí." : "¿Te invitaron como dependiente?"}
+                        </button>
+
+                        <Button
+                            type="submit"
+                            className="w-full h-11 rounded-xl font-bold text-white bg-indigo-600 hover:bg-indigo-500 shadow-lg shadow-indigo-900/40 border-0 transition-all"
+                        >
+                            {isDependent ? "Unirme a Familia" : "Crear Grupo Familiar"}
+                        </Button>
+
+                        <p className="text-center text-xs text-white/40 pt-1">
+                            ¿Ya tienes cuenta?{" "}
+                            <button type="button" onClick={() => setTab("login")} className="text-indigo-300 font-semibold hover:text-indigo-200">
+                                Ingresar
+                            </button>
+                        </p>
                     </form>
-                </Card>
+                )}
+
+                <p className="text-center text-xs text-white/20 mt-4">Bolsillo v3.0 · Finanzas Familiares</p>
             </div>
         </div>
     )
