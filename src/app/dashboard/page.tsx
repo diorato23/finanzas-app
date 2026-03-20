@@ -30,7 +30,7 @@ export default async function DashboardPage() {
     const now = new Date()
 
     return (
-        <div className="space-y-8 pb-8">
+        <div className="space-y-6 pb-8">
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                 <div>
                     <h2 className="text-2xl sm:text-3xl font-bold tracking-tight text-foreground">

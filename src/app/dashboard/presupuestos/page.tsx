@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { TrashIcon, AlertCircle, TrendingDown } from "lucide-react"
+import { TrashIcon, AlertCircle, TrendingDown, SearchIcon } from "lucide-react"
 import { deletePresupuesto } from "./actions"
 import { DeleteButton } from "@/components/ui/delete-button"
 import { PresupuestoClientForm } from "./client-form"
@@ -83,7 +83,7 @@ export default async function PresupuestosPage({ searchParams }: { searchParams:
     }
 
     return (
-        <div className="space-y-6 max-w-5xl mx-auto pb-20 md:pb-6">
+        <div className="space-y-6 pb-8">
             <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
                 <div>
                     <h2 className="text-3xl font-bold tracking-tight text-foreground">Presupuestos</h2>
@@ -92,16 +92,18 @@ export default async function PresupuestosPage({ searchParams }: { searchParams:
                     </p>
                 </div>
 
-                <form className="flex items-center gap-2 max-w-xs w-full" method="get">
+                <form className="flex items-center gap-2" method="get">
                     <Label htmlFor="mes_anio" className="sr-only">Mes</Label>
                     <Input
                         id="mes_anio"
                         name="mes_anio"
                         type="month"
                         defaultValue={selectedMonth}
-                        className="bg-card w-full"
+                        className="bg-card rounded-xl border-border/60 w-44"
                     />
-                    <Button type="submit" variant="secondary">Ver</Button>
+                    <Button type="submit" size="icon" variant="secondary" className="rounded-xl shrink-0" title="Filtrar mes">
+                        <SearchIcon className="w-4 h-4" />
+                    </Button>
                 </form>
             </div>
 
