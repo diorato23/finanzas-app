@@ -1,11 +1,5 @@
 import { test, expect } from '@playwright/test';
 
-// Gerar dados aleatórios para o teste não falhar por duplicidade
-const timestamp = Date.now();
-const testEmail = `user_${timestamp}@example.com`;
-const testNombre = `Teste E2E ${timestamp}`;
-const testFamilia = `Familia Playwright ${timestamp}`;
-
 test.describe('App Finanças - Fluxo Completo', () => {
 
     test('deve registrar um novo usuário e navegar para o dashboard', async ({ page }) => {

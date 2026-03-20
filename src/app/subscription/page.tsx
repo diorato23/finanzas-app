@@ -48,8 +48,7 @@ export default async function SubscriptionPage() {
             redirect("/dashboard")
         }
     }
-
-    const isAdmin = perfil?.rol === 'admin' || perfil?.rol === 'co_admin'; // Treat co_admin closely or just strictly admin for copy.
+    
     // Wait, the user said the security layer is for the owner. Admin is the owner.
     const isOwner = perfil?.rol === 'admin';
 

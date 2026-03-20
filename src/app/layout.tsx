@@ -1,8 +1,6 @@
 import { Outfit } from "next/font/google"
 import "./globals.css"
 import { ThemeProvider } from "@/components/theme-provider"
-import { ServiceWorkerRegister } from "@/components/pwa-register"
-import { Toaster } from "sonner"
 import { Metadata, Viewport } from "next"
 
 const outfit = Outfit({ 

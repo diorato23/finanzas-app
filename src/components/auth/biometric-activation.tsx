@@ -4,7 +4,7 @@ import { useEffect, useState } from "react"
 import { startRegistration } from "@simplewebauthn/browser"
 import { getRegistrationOptions, verifyRegistration } from "@/app/auth/webauthn/actions"
 import { Button } from "@/components/ui/button"
-import { Fingerprint, CheckCircle2, ShieldCheck } from "lucide-react"
+import { Fingerprint } from "lucide-react"
 import { Card, CardContent } from "@/components/ui/card"
 import { toast } from "sonner"
 

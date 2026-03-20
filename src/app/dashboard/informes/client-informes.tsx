@@ -112,7 +112,7 @@ export function InformeClient({ categories }: { categories: CategoriaData[] }) {
             } else if (res.data) {
                 setChartData(res.data)
             }
-        } catch (err) {
+        } catch {
             setErrorMsg("Error al generar el informe.")
         } finally {
             setIsPending(false)

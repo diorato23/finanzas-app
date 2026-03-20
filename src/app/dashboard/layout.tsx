@@ -3,7 +3,6 @@ import { createClient } from "@/lib/supabase/server"
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar"
 import { AppSidebar } from "@/components/app-sidebar"
 import { AppBottomNav } from "@/components/app-bottom-nav"
-import { Moon, Sun } from "lucide-react"
 import { HeaderThemeToggle } from "@/components/header-theme-toggle"
 
 export default async function DashboardLayout({

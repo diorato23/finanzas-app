@@ -1,21 +1,15 @@
 "use client"
 
 import * as React from "react"
-import Link from "next/link"
 import { usePathname } from "next/navigation"
 import {
     Wallet,
     LayoutDashboard,
     List,
-    BarChart2,
     PieChart,
     Users,
     Tag,
-    Shield,
     LogOut,
-    ChevronRight,
-    WalletIcon,
-    TagsIcon,
     LineChart
 } from "lucide-react"
 
@@ -28,7 +22,6 @@ import {
     SidebarMenuButton,
     SidebarMenuItem,
     SidebarRail,
-    useSidebar,
 } from "@/components/ui/sidebar"
 import { createClient } from "@/lib/supabase/client"
 import { useRouter } from "next/navigation"
@@ -65,7 +58,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
             }
         }
         loadUserAccess()
-    }, [])
+    }, [supabase])
 
     const handleLogout = async () => {
         await supabase.auth.signOut()
