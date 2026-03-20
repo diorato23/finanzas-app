@@ -89,43 +89,43 @@
 }
 
 .dark {
-  /* Minimal Dark Mode mapping of Agente Financeiro */
-  --background: #0f172a;
-  --foreground: #f8fafc;
+  /* Dark Mode refinado — mais suave e legível */
+  --background: #161b2e;        /* grafite azulado, não negro puro */
+  --foreground: #e8eaf6;        /* branco-lavanda suave, confortável aos olhos */
 
-  --card: #1e293b;
-  --card-foreground: #f1f5f9;
+  --card: #1e2540;              /* card com elevação visível sobre o fundo */
+  --card-foreground: #dde1f5;   /* texto dos cards — alta legibilidade */
 
-  --popover: #1e293b;
-  --popover-foreground: #f8fafc;
+  --popover: #252d4a;
+  --popover-foreground: #e8eaf6;
 
-  --primary: #818cf8; /* --primary-light */
+  --primary: #7c86f0;           /* indigo claro — visível e não agressivo */
   --primary-foreground: #ffffff;
 
-  --secondary: #334155;
-  --secondary-foreground: #cbd5e1;
+  --secondary: #2a3355;         /* secções e badges com contraste claro */
+  --secondary-foreground: #b8c0e0;
 
-  --muted: #334155;
-  --muted-foreground: #94a3b8;
+  --muted: #232b47;
+  --muted-foreground: #8892b8;  /* textos secundários com contraste 4.5:1 */
 
-  --accent: rgba(79, 70, 229, 0.15); /* --primary-glow */
-  --accent-foreground: #818cf8;
+  --accent: rgba(124,134,240,0.18);
+  --accent-foreground: #9ba7f5;
 
-  --destructive: #f87171;
-  --destructive-foreground: #ffffff;
+  --destructive: #f08080;       /* vermelho suave — legível sem agredir */
+  --destructive-foreground: #1a0a0a;
 
-  --border: #334155;
-  --input: #334155;
-  --ring: #818cf8;
+  --border: #2e3859;            /* border visível mas discreta */
+  --input: #2a3355;
+  --ring: rgba(124,134,240,0.5);
 
-  --sidebar: #1e293b;
-  --sidebar-foreground: #f8fafc;
-  --sidebar-primary: #818cf8;
+  --sidebar: #1a2035;
+  --sidebar-foreground: #dde1f5;
+  --sidebar-primary: #7c86f0;
   --sidebar-primary-foreground: #ffffff;
-  --sidebar-accent: rgba(79, 70, 229, 0.15);
-  --sidebar-accent-foreground: #818cf8;
-  --sidebar-border: #334155;
-  --sidebar-ring: #818cf8;
+  --sidebar-accent: rgba(124,134,240,0.15);
+  --sidebar-accent-foreground: #9ba7f5;
+  --sidebar-border: #2e3859;
+  --sidebar-ring: rgba(124,134,240,0.5);
 }
 
 @layer base {

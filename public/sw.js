@@ -1,4 +1,7 @@
-const CACHE_NAME = 'finanzas-app-v2';
+// Versão do cache — incrementar a cada deploy para forçar atualização
+const CACHE_VERSION = 'v4';
+const CACHE_NAME = `bolsillo-${CACHE_VERSION}`;
+
 const ASSETS_TO_CACHE = [
     '/',
     '/manifest.json',
@@ -8,69 +11,84 @@ const ASSETS_TO_CACHE = [
     '/favicon.ico'
 ];
 
+// ── INSTALL: abre o cache novo e pula espera ──────────────────────────
 self.addEventListener('install', (event) => {
     event.waitUntil(
         caches.open(CACHE_NAME).then((cache) => {
-            console.log('[Service Worker] Caching app shell');
+            console.log('[SW] Cache ' + CACHE_NAME + ' instalado');
             return cache.addAll(ASSETS_TO_CACHE);
         })
     );
+    // CRÍTICO: não espera fechar as abas antigas — ativa imediatamente
     self.skipWaiting();
 });
 
+// ── ACTIVATE: apaga caches antigos E avisa todos os clientes ─────────
 self.addEventListener('activate', (event) => {
     event.waitUntil(
-        caches.keys().then((cacheNames) => {
-            return Promise.all(
-                cacheNames.map((name) => {
-                    if (name !== CACHE_NAME) {
-                        return caches.delete(name);
-                    }
-                })
-            );
-        })
+        Promise.all([
+            // 1. Limpar caches antigos
+            caches.keys().then((cacheNames) =>
+                Promise.all(
+                    cacheNames.map((name) => {
+                        if (name !== CACHE_NAME) {
+                            console.log('[SW] Removendo cache antigo:', name);
+                            return caches.delete(name);
+                        }
+                    })
+                )
+            ),
+            // 2. Tomar controle de todas as abas abertas
+            self.clients.claim()
+        ])
     );
-    self.clients.claim();
+
+    // 3. Notificar todas as abas para recarregar a página automaticamente
+    self.clients.matchAll({ type: 'window', includeUncontrolled: true }).then((clients) => {
+        clients.forEach((client) => {
+            console.log('[SW] Recarregando aba:', client.url);
+            client.navigate(client.url);
+        });
+    });
 });
 
+// ── FETCH ─────────────────────────────────────────────────────────────
 self.addEventListener('fetch', (event) => {
     const { request } = event;
     const url = new URL(request.url);
 
     // Só intercepta requisições do mesmo domínio
-    if (url.origin !== self.location.origin) {
-        return;
-    }
+    if (url.origin !== self.location.origin) return;
 
-    // A API de Cache suporta apenas requisições GET
-    if (request.method !== 'GET') {
-        return;
-    }
+    // Só GET
+    if (request.method !== 'GET') return;
 
-    // Ignora requisições de API para o Supabase e arquivos de dados do Next.js (esses exigem rede)
+    // API e dados do Next.js → sempre rede
     if (url.pathname.startsWith('/api/') || url.pathname.startsWith('/_next/data/')) {
         event.respondWith(
-            fetch(request).catch(() => {
-                return caches.match(request);
-            })
+            fetch(request).catch(() => caches.match(request))
         );
         return;
     }
 
-    // Estratégia de Cache-First para Ativos Estáticos (JS de chunks, CSS, Imagens)
-    if (url.pathname.startsWith('/_next/static/') || url.pathname.startsWith('/icons/') || request.destination === 'image' || request.destination === 'script' || request.destination === 'style') {
+    // Ativos estáticos (_next/static) → Cache-First
+    if (
+        url.pathname.startsWith('/_next/static/') ||
+        url.pathname.startsWith('/icons/') ||
+        request.destination === 'image' ||
+        request.destination === 'script' ||
+        request.destination === 'style'
+    ) {
         event.respondWith(
-            caches.match(request).then((cachedResponse) => {
-                if (cachedResponse) return cachedResponse;
-
-                return fetch(request).then((networkResponse) => {
-                    if (networkResponse && networkResponse.status === 200) {
-                        const responseToCache = networkResponse.clone();
-                        caches.open(CACHE_NAME).then((cache) => cache.put(request, responseToCache));
+            caches.match(request).then((cached) => {
+                if (cached) return cached;
+                return fetch(request).then((response) => {
+                    if (response?.status === 200) {
+                        const toCache = response.clone();
+                        caches.open(CACHE_NAME).then((cache) => cache.put(request, toCache));
                     }
-                    return networkResponse;
+                    return response;
                 }).catch(() => {
-                    // Fallback para imagens se offline e não cacheado
                     if (request.destination === 'image') {
                         return caches.match('/icons/icon-192x192.png');
                     }
@@ -80,22 +98,19 @@ self.addEventListener('fetch', (event) => {
         return;
     }
 
-    // Estratégia de Network-First com Fallback para Cache (para HTML e navegação principal)
+    // HTML e navegação → Network-First com fallback
     event.respondWith(
-        fetch(request).then((networkResponse) => {
-            if (networkResponse && networkResponse.status === 200) {
-                const responseToCache = networkResponse.clone();
-                caches.open(CACHE_NAME).then((cache) => cache.put(request, responseToCache));
+        fetch(request).then((response) => {
+            if (response?.status === 200) {
+                const toCache = response.clone();
+                caches.open(CACHE_NAME).then((cache) => cache.put(request, toCache));
             }
-            return networkResponse;
-        }).catch(() => {
-            return caches.match(request).then((cachedResponse) => {
-                if (cachedResponse) return cachedResponse;
-                // Se for navegação e não tem no cache, retorna o root (SPA behavior)
-                if (request.mode === 'navigate') {
-                    return caches.match('/');
-                }
-            });
-        })
+            return response;
+        }).catch(() =>
+            caches.match(request).then((cached) => {
+                if (cached) return cached;
+                if (request.mode === 'navigate') return caches.match('/');
+            })
+        )
     );
 });
