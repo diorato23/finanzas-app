@@ -44,6 +44,7 @@ export function InformeClient({ categories }: { categories: CategoriaData[] }) {
     const [chartData, setChartData] = useState<InformeData[] | null>(null)
     const [isPending, setIsPending] = useState(false)
     const [errorMsg, setErrorMsg] = useState("")
+    const [periodoLabel, setPeriodoLabel] = useState("")
 
     useEffect(() => {
         setMounted(true)
@@ -92,8 +93,17 @@ export function InformeClient({ categories }: { categories: CategoriaData[] }) {
         setChartData(null)
         setIsPending(true)
 
+        const formData = new FormData(e.currentTarget)
+        const inicio = formData.get("fechaInicio") as string
+        const fin = formData.get("fechaFin") as string
+        const cat = formData.get("categoria") as string
+
+        // Montar label de período para exibir no gráfico
+        const fmtDate = (d: string) => new Date(d + 'T12:00:00').toLocaleDateString('es-CO', { day: '2-digit', month: 'short', year: 'numeric' })
+        const catLabel = cat && cat !== 'todas' ? ` · ${getCategoryWithEmoji(cat)}` : ''
+        setPeriodoLabel(`${fmtDate(inicio)} — ${fmtDate(fin)}${catLabel}`)
+
         try {
-            const formData = new FormData(e.currentTarget)
             const { generarInforme } = await import('./actions')
             const res = await generarInforme(formData)
 
@@ -235,6 +245,11 @@ export function InformeClient({ categories }: { categories: CategoriaData[] }) {
                             <div className="flex justify-between items-start md:items-center flex-col md:flex-row gap-4">
                                 <div>
                                     <CardTitle className="text-xl font-bold">Evolución de Ingresos y Gastos</CardTitle>
+                                    {periodoLabel && (
+                                        <CardDescription className="mt-1 text-sm font-medium text-indigo-500 dark:text-indigo-400">
+                                            📅 {periodoLabel}
+                                        </CardDescription>
+                                    )}
                                 </div>
                                 <Button
                                     variant="outline"
