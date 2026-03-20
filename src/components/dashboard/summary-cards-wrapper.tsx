@@ -1,5 +1,5 @@
 import { SummaryCard } from "@/components/summary-card"
-import { WalletIcon, TrendingUp, TrendingDown } from "lucide-react"
+import { WalletIcon, TrendingUp, TrendingDown, Scale } from "lucide-react"
 import { createClient } from "@/lib/supabase/server"
 
 export async function SummaryCardsWrapper() {
@@ -31,31 +31,40 @@ export async function SummaryCardsWrapper() {
     })
 
     const saldoActual = totalCobrado - totalPagado
+    const saldoNeto = totalIngresos - totalGastos
+    const saldoPositivo = saldoNeto >= 0
 
     return (
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             <SummaryCard
-                title="Saldo Total"
-                amount={saldoActual}
-                icon={WalletIcon}
-                variant="default"
-                description="Efectivo actual disponible"
-            />
-            <SummaryCard
-                title="Ingresos"
+                title="Ingresos del Mes"
                 amount={totalIngresos}
                 icon={TrendingUp}
                 variant="success"
-                description="Total esperado este mes"
+                description="Total de ingresos registrados"
                 href="/dashboard/transacciones"
             />
             <SummaryCard
-                title="Gastos"
+                title="Gastos del Mes"
                 amount={totalGastos}
                 icon={TrendingDown}
                 variant="danger"
-                description="Total agendado este mes"
+                description="Total de gastos registrados"
                 href="/dashboard/transacciones"
+            />
+            <SummaryCard
+                title="Saldo Disponible"
+                amount={saldoActual}
+                icon={WalletIcon}
+                variant="default"
+                description="Recibido menos pagado"
+            />
+            <SummaryCard
+                title="Balance Neto"
+                amount={saldoNeto}
+                icon={Scale}
+                variant={saldoPositivo ? "success" : "danger"}
+                description={saldoPositivo ? "¡Mes positivo! 🎉" : "Gastos superan ingresos"}
             />
         </div>
     )
