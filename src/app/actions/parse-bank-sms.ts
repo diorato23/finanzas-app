@@ -1,63 +1,169 @@
 'use server'
 
-import { generateObject } from 'ai';
-import { google } from '@ai-sdk/google';
-import { z } from 'zod';
+/**
+ * Botón Mágico — Parser de SMS bancarios colombianos (sin IA, solo regex)
+ * Bancos soportados: Nequi, Daviplata, Bancolombia, Lulo Bank, PSE, genérico
+ */
 
-const transactionSchema = z.object({
-  amount: z.number().describe('El valor exacto de la transacción. Elimina el símbolo $ y los puntos de separación de miles. Ejemplo: si el texto dice "$ 15.000", retorna 15000.'),
-  type: z.enum(['income', 'expense']).describe('Si es una entrada (income) o salida (expense).'),
-  description: z.string().describe('Nombre limpio y comercial del establecimiento o persona. Elimina códigos inútiles del banco.'),
-  date: z.string().describe('Fecha en formato YYYY-MM-DD. Si el SMS dice "hoy", usa la fecha de hoy.'),
-  suggestedCategory: z.string().describe('La categoría que mejor encaja con la descripción.'),
-});
+export interface ParsedTransaction {
+  amount: number
+  type: 'income' | 'expense'
+  description: string
+  suggestedCategory: string
+}
 
-export async function parseTransactionText(rawText: string, availableCategories: string[]) {
-  const apiKey = process.env.GOOGLE_GENERATIVE_AI_API_KEY;
+/** Limpia el valor monetario colombiano y retorna un número */
+function parseAmount(raw: string): number {
+  // Soporta: "$ 18.500", "$18500", "18,500", "18.500", "$170,000"
+  const cleaned = raw.replace(/[$\s]/g, '').replace(/\./g, '').replace(/,/g, '')
+  return parseInt(cleaned, 10) || 0
+}
 
-  if (!apiKey) {
-    return { 
-      success: false, 
-      error: "API Key de Google no configurada en el servidor. Contacta al administrador." 
-    };
+/** Sugiere categoría basado en palabras clave del establecimiento */
+function suggestCategory(description: string, availableCategories: string[]): string {
+  const lower = description.toLowerCase()
+
+  const keywordMap: Record<string, string[]> = {
+    'Alimentación':   ['rappi', 'domicilios', 'mercado', 'éxito', 'exito', 'jumbo', 'carulla', 'oma', 'subway', 'mcdonald', 'kfc', 'pizza', 'restaurante', 'comida', 'supermercado', 'tienda', 'panaderia', 'café', 'cafe'],
+    'Transporte':     ['uber', 'cabify', 'beat', 'taxi', 'gasolina', 'combustible', 'parking', 'parqueadero', 'peaje', 'transmilenio', 'sitp'],
+    'Vivienda':       ['arriendo', 'alquiler', 'servicios', 'agua', 'luz', 'gas', 'internet', 'claro', 'movistar', 'tigo', 'etb'],
+    'Salud':          ['farmacia', 'droguería', 'drogueria', 'clínica', 'clinica', 'hospital', 'médico', 'medico', 'consultorio', 'copago'],
+    'Suscripciones':  ['netflix', 'spotify', 'youtube', 'amazon', 'disney', 'hbo', 'prime', 'apple', 'icloud', 'google one'],
+    'Ingresos':       ['salario', 'nomina', 'nómina', 'pago sueldo', 'transferencia recibida', 'te enviaron', 'recibiste'],
   }
 
-  try {
-    const { object } = await generateObject({
-      model: google('gemini-2.0-flash'), // gemini-2.0-flash: más rápido y preciso
-      schema: transactionSchema,
-      system: `Eres un extractor de datos financieros especializado en el sistema bancario de Colombia.
-               El usuario enviará textos copiados de notificaciones push o SMS de apps como Nequi, Daviplata, Bancolombia App, Lulo Bank, o recibos de PSE y Transfiya.
-               
-               REGLAS DE NEGOCIO Y JERGA COLOMBIANA:
-               1. **Valores (COP):** Ignorar el separador de miles. "$ 50.000" debe convertirse en el número 50000.
-               2. **Gastos (expense):** Busca términos como "Compra por", "Pagaste", "Transferencia a", "Pago PSE", "Retiro", "Te descontamos", "Retiraste".
-               3. **Ingresos (income):** Busca términos como "Te enviaron plata", "Recibiste", "Transferencia de", "Recarga", "Abono a tu cuenta".
-               4. **Limpieza de Descripción:** 
-                  - Si es "Compra Aprobada PSE*MERCADOLIBRE BOGOTA", retorna solo "Mercado Libre".
-                  - Si es "Transferencia exitosa a Nequi de JUAN PEREZ", retorna "Juan Perez (Nequi)".
-                  - Si es un retiro, retorna "Retiro (Corresponsal Nombre del lugar)".
-               5. Las categorías disponibles son ÚNICAMENTE estas: ${availableCategories.join(', ')}. Elige la más precisa de esta lista exacta.`,
-      prompt: `Extrae los datos financieros de esta notificación bancaria colombiana: "${rawText}"`,
-    });
-
-    return { success: true, data: object };
-
-  } catch (error: unknown) {
-    console.error("Error al analizar notificación:", error);
-
-    const msg = error instanceof Error ? error.message : String(error);
-
-    // Error específico de API key inválida
-    if (msg.toLowerCase().includes('api_key') || msg.toLowerCase().includes('401') || msg.toLowerCase().includes('invalid')) {
-      return { success: false, error: "API Key de Google inválida o sin permisos. Verifica la configuración." };
+  for (const [category, keywords] of Object.entries(keywordMap)) {
+    if (keywords.some(kw => lower.includes(kw))) {
+      // Solo retorna si la categoría está disponible para este usuario
+      if (availableCategories.includes(category)) return category
     }
+  }
 
-    // Error de modelo no disponible
-    if (msg.toLowerCase().includes('model') || msg.toLowerCase().includes('404')) {
-      return { success: false, error: "Modelo de IA no disponible temporalmente. Intenta en unos minutos." };
+  return availableCategories.includes('Otros') ? 'Otros' : availableCategories[0] || 'Otros'
+}
+
+/** Limpia el nombre del establecimiento */
+function cleanDescription(raw: string): string {
+  return raw
+    .replace(/PSE\*/gi, '')           // Quita prefijo PSE*
+    .replace(/\s{2,}/g, ' ')          // Colapsa espacios múltiples
+    .trim()
+    .split(' ')
+    .map(w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()) // Title Case
+    .join(' ')
+}
+
+// ─── PATRONES POR BANCO ────────────────────────────────────────────────────
+
+const PATTERNS: Array<{
+  bank: string
+  regex: RegExp
+  extract: (m: RegExpMatchArray) => { amount: number; type: 'income' | 'expense'; description: string }
+}> = [
+  // NEQUI — gastos: "¡Listo! Pagaste $ 18.500 en RAPPI S.A.S con tu Tarjeta Nequi"
+  {
+    bank: 'Nequi',
+    regex: /pagaste\s*\$?\s*([\d.,]+)\s+en\s+([A-ZÁÉÍÓÚÑa-záéíóúñ0-9 .,'*&-]+?)(?:\s+con|\s+desde|$)/i,
+    extract: (m) => ({ amount: parseAmount(m[1]), type: 'expense', description: cleanDescription(m[2]) }),
+  },
+  // NEQUI — ingresos: "Te enviaron $50.000 de Juan Carlos Lopez"
+  {
+    bank: 'Nequi',
+    regex: /te enviaron\s*\$?\s*([\d.,]+)\s+de\s+([A-ZÁÉÍÓÚÑa-záéíóúñ ]+)/i,
+    extract: (m) => ({ amount: parseAmount(m[1]), type: 'income', description: `${cleanDescription(m[2])} (Nequi)` }),
+  },
+  // NEQUI — "Retiraste $170,000 en nuestro corresponsal BARRIO LA ESTANCIA"
+  {
+    bank: 'Nequi',
+    regex: /retiraste\s*\$?\s*([\d.,]+)\s+en\s+(?:nuestro\s+corresponsal\s+)?([A-ZÁÉÍÓÚÑa-záéíóúñ0-9 ]+)/i,
+    extract: (m) => ({ amount: parseAmount(m[1]), type: 'expense', description: `Retiro Corresponsal ${cleanDescription(m[2])}` }),
+  },
+  // DAVIPLATA — "Transferencia de $120.000 a Pedro Lopez fue exitosa"
+  {
+    bank: 'Daviplata',
+    regex: /transferencia de\s*\$?\s*([\d.,]+)\s+a\s+([A-ZÁÉÍÓÚÑa-záéíóúñ ]+?)(?:\s+fue|\s+por|$)/i,
+    extract: (m) => ({ amount: parseAmount(m[1]), type: 'expense', description: `${cleanDescription(m[2])} (Daviplata)` }),
+  },
+  // DAVIPLATA — "Recibiste $80.000 de Maria Garcia"
+  {
+    bank: 'Daviplata',
+    regex: /recibiste\s*\$?\s*([\d.,]+)\s+de\s+([A-ZÁÉÍÓÚÑa-záéíóúñ ]+)/i,
+    extract: (m) => ({ amount: parseAmount(m[1]), type: 'income', description: `${cleanDescription(m[2])} (Daviplata)` }),
+  },
+  // BANCOLOMBIA — "Compra aprobada por $35,000 en ÉXITO BOGOTÁ"
+  {
+    bank: 'Bancolombia',
+    regex: /compra aprobada por\s*\$?\s*([\d.,]+)\s+en\s+([A-ZÁÉÍÓÚÑa-záéíóúñ0-9 .,'*&-]+?)(?:\s+Tu|\s+Saldo|$)/i,
+    extract: (m) => ({ amount: parseAmount(m[1]), type: 'expense', description: cleanDescription(m[2]) }),
+  },
+  // BANCOLOMBIA — "Transferencia desde cuenta a Juan Perez por $200.000"
+  {
+    bank: 'Bancolombia',
+    regex: /transferencia.*?a\s+([A-ZÁÉÍÓÚÑa-záéíóúñ ]+?)\s+por\s*\$?\s*([\d.,]+)/i,
+    extract: (m) => ({ amount: parseAmount(m[2]), type: 'expense', description: `${cleanDescription(m[1])} (Bancolombia)` }),
+  },
+  // LULO BANK — "Lulo Bank: Pagaste $12.000 en Rappi"
+  {
+    bank: 'Lulo Bank',
+    regex: /lulo bank[:\s]+pagaste\s*\$?\s*([\d.,]+)\s+en\s+([A-ZÁÉÍÓÚÑa-záéíóúñ0-9 .]+)/i,
+    extract: (m) => ({ amount: parseAmount(m[1]), type: 'expense', description: cleanDescription(m[2]) }),
+  },
+  // PSE — "Pago PSE aprobado $95.000 — Netflix"
+  {
+    bank: 'PSE',
+    regex: /pago pse.*?\$?\s*([\d.,]+)[^A-Za-z]*(?:—|-|a|en)?\s*([A-ZÁÉÍÓÚÑa-záéíóúñ0-9 .]+)/i,
+    extract: (m) => ({ amount: parseAmount(m[1]), type: 'expense', description: cleanDescription(m[2]) }),
+  },
+  // GENÉRICO — extrae cualquier monto con "$ 99.999" o "$99999" y el texto que lo rodea
+  {
+    bank: 'Genérico',
+    regex: /\$\s*([\d.,]+)/,
+    extract: (m) => ({ amount: parseAmount(m[1]), type: 'expense', description: 'Transacción' }),
+  },
+]
+
+// ─── FUNCIÓN PRINCIPAL ─────────────────────────────────────────────────────
+
+export async function parseTransactionText(
+  rawText: string,
+  availableCategories: string[]
+): Promise<{ success: boolean; data?: ParsedTransaction; error?: string }> {
+  const text = rawText.trim()
+
+  if (!text) {
+    return { success: false, error: 'El campo está vacío.' }
+  }
+
+  for (const pattern of PATTERNS) {
+    const match = text.match(pattern.regex)
+    if (match) {
+      try {
+        const extracted = pattern.extract(match)
+
+        if (!extracted.amount || extracted.amount <= 0) continue
+
+        const category = suggestCategory(
+          extracted.description + ' ' + text,
+          availableCategories
+        )
+
+        return {
+          success: true,
+          data: {
+            amount: extracted.amount,
+            type: extracted.type,
+            description: extracted.description || 'Transacción',
+            suggestedCategory: category,
+          },
+        }
+      } catch {
+        continue
+      }
     }
+  }
 
-    return { success: false, error: "No pude interpretar el SMS. ¿El texto es de Nequi, Daviplata o Bancolombia?" };
+  return {
+    success: false,
+    error: '⚠️ No reconocí el formato de este SMS. ¿Es de Nequi, Daviplata o Bancolombia? Puedes llenar los datos manualmente.',
   }
 }
