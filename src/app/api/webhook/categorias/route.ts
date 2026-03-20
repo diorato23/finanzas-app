@@ -75,10 +75,19 @@ async function crearCategoria(
         return NextResponse.json({ error: "Solo administradores pueden crear categorías" }, { status: 403 });
     }
 
-    const nombre = String(body.nombre || "").trim();
-    if (!nombre || nombre.length < 2) {
+    const rawName = String(body.nombre || "").trim();
+    if (!rawName || rawName.length < 2) {
         return NextResponse.json({ error: "El nombre debe tener al menos 2 caracteres" }, { status: 400 });
     }
+
+    // Normaliza: remove palavras comuns e capitaliza (Title Case)
+    const stopWords = ["categoria", "categoría", "categorias", "categorías", "nueva", "novo", "nova", "de", "la", "el"];
+    const nombre = rawName
+        .split(/\s+/)
+        .filter(w => !stopWords.includes(w.toLowerCase()))
+        .map(w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase())
+        .join(" ")
+        .trim() || rawName.charAt(0).toUpperCase() + rawName.slice(1);
 
     const { error } = await supabase
         .from("categorias")

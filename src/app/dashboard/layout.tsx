@@ -37,6 +37,35 @@ export default async function DashboardLayout({
             console.error("Erro ao buscar perfil:", e)
         }
 
+        // Verificar trial expirado
+        if (perfil) {
+            let activeSubscription = perfil.subscription_status
+            let activeTrialEndsAt = perfil.trial_ends_at
+
+            // Se não é admin, herda subscription do admin da família
+            if (perfil.rol !== 'admin' && perfil.familia_id) {
+                const { data: adminPerfil } = await supabase
+                    .from("perfiles")
+                    .select("subscription_status, trial_ends_at")
+                    .eq("familia_id", perfil.familia_id)
+                    .eq("rol", "admin")
+                    .single()
+                
+                if (adminPerfil) {
+                    activeSubscription = adminPerfil.subscription_status
+                    activeTrialEndsAt = adminPerfil.trial_ends_at
+                }
+            }
+
+            if (activeSubscription === 'trial' && activeTrialEndsAt) {
+                const now = new Date()
+                const trialEnds = new Date(activeTrialEndsAt)
+                if (now > trialEnds) {
+                    redirect("/subscription")
+                }
+            }
+        }
+
         const safePerfil = perfil || {
             nombre: "Usuario Temporario",
             rol: "dependiente",

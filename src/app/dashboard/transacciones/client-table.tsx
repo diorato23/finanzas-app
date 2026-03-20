@@ -4,10 +4,10 @@ import { motion, AnimatePresence } from "framer-motion"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
-import { CheckCircleIcon, TrashIcon } from "lucide-react"
+import { TrashIcon } from "lucide-react"
 import { EditTransactionSheet } from "./edit-sheet"
 import { getCategoryWithEmoji } from "@/lib/utils"
-import { updateTransaccionEstado, deleteTransaccion } from "./actions"
+import { deleteTransaccion } from "./actions"
 import { useTransition } from "react"
 import { toast } from "sonner"
 import { EmptyState } from "@/components/ui/empty-state"
@@ -42,16 +42,7 @@ export function ClientTable({ transacciones, categoriasDisponibles }: ClientTabl
     const [isPending, startTransition] = useTransition()
     const router = useRouter()
 
-    const handleUpdateEstado = async (id: string, nuevoEstado: string) => {
-        startTransition(async () => {
-            const res = await updateTransaccionEstado(id, nuevoEstado)
-            if (res?.error) {
-                toast.error(res.error)
-            } else {
-                toast.success("Estado actualizado")
-            }
-        })
-    }
+
 
     const handleDelete = async (id: string) => {
         if (!confirm("¿Eliminar esta transacción?")) return
@@ -83,7 +74,7 @@ export function ClientTable({ transacciones, categoriasDisponibles }: ClientTabl
                         <TableHead className="font-semibold text-muted-foreground hidden md:table-cell">Categoría</TableHead>
                         <TableHead className="font-semibold text-muted-foreground">Responsable</TableHead>
                         <TableHead className="font-semibold text-muted-foreground">Monto</TableHead>
-                        <TableHead className="font-semibold text-muted-foreground text-center">Estado</TableHead>
+
                         <TableHead className="font-semibold text-muted-foreground text-right">Acciones</TableHead>
                     </TableRow>
                 </TableHeader>
@@ -128,26 +119,10 @@ export function ClientTable({ transacciones, categoriasDisponibles }: ClientTabl
                                     <TableCell className={`font-bold tracking-tight ${isIncome ? 'text-emerald-600' : 'text-rose-600'}`}>
                                         {formatCOP(t.monto)}
                                     </TableCell>
-                                    <TableCell className="text-center">
-                                        {t.estado === 'pendiente' && <Badge variant="outline" className="text-amber-600 border-amber-200 bg-amber-50">Pendiente</Badge>}
-                                        {t.estado === 'pagado' && <Badge variant="default" className="bg-emerald-100 hover:bg-emerald-200 text-emerald-700 shadow-none border-0">Pagado</Badge>}
-                                        {t.estado === 'recibido' && <Badge variant="default" className="bg-emerald-100 hover:bg-emerald-200 text-emerald-700 shadow-none border-0">Recibido</Badge>}
-                                    </TableCell>
+
                                     <TableCell className="text-right space-x-2">
                                         <div className="flex items-center justify-end gap-2 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity">
-                                            {t.estado === 'pendiente' && (
-                                                <Button 
-                                                    variant="ghost" 
-                                                    size="icon" 
-                                                    onClick={() => handleUpdateEstado(t.id, isIncome ? 'recibido' : 'pagado')}
-                                                    disabled={isPending}
-                                                    className="h-8 w-8 text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50" 
-                                                    title="Marcar como Listo"
-                                                >
-                                                    <CheckCircleIcon className="w-4 h-4" />
-                                                    <span className="sr-only">Listo</span>
-                                                </Button>
-                                            )}
+
                                             <EditTransactionSheet transaccion={t} categoriasDisponibles={categoriasDisponibles} />
                                             <Button 
                                                 variant="ghost" 
