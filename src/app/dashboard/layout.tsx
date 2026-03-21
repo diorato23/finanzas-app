@@ -120,6 +120,17 @@ export default async function DashboardLayout({
             </SidebarProvider>
         )
     } catch (error: unknown) {
+        // NEXT_REDIRECT é uma exceção interna do Next.js — deve ser re-lançada
+        if (error instanceof Error && error.message === 'NEXT_REDIRECT') {
+            throw error
+        }
+        // Verificação adicional pelo digest (compatibilidade com versões do Next.js)
+        if (typeof error === 'object' && error !== null && 'digest' in error) {
+            const digest = (error as { digest?: string }).digest
+            if (typeof digest === 'string' && digest.startsWith('NEXT_REDIRECT')) {
+                throw error
+            }
+        }
         const err = error instanceof Error ? error : new Error(String(error))
         return (
             <div className="p-10 bg-red-100 text-red-900 border-2 border-red-500 rounded-lg m-4">
