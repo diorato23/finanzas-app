@@ -2,6 +2,16 @@ import { createServerClient } from "@supabase/ssr"
 import { NextResponse, type NextRequest } from "next/server"
 
 export async function updateSession(request: NextRequest) {
+    // Interceptar token_hash de recovery vindo do email (pode chegar em qualquer rota)
+    const tokenHash = request.nextUrl.searchParams.get('token_hash')
+    const type = request.nextUrl.searchParams.get('type')
+    if (tokenHash && type && !request.nextUrl.pathname.startsWith('/auth/confirm')) {
+        const confirmUrl = request.nextUrl.clone()
+        confirmUrl.pathname = '/auth/confirm'
+        // Manter os params originais (token_hash, type, next)
+        return NextResponse.redirect(confirmUrl)
+    }
+
     let supabaseResponse = NextResponse.next({
         request,
     })
@@ -38,7 +48,8 @@ export async function updateSession(request: NextRequest) {
     const isPublicRoute = 
         request.nextUrl.pathname.startsWith('/forgot-password') ||
         request.nextUrl.pathname.startsWith('/reset-password') ||
-        request.nextUrl.pathname.startsWith('/auth/callback')
+        request.nextUrl.pathname.startsWith('/auth/callback') ||
+        request.nextUrl.pathname.startsWith('/auth/confirm')
     
     if (!user && !isAuthRoute && !isApiRoute && !isPublicRoute && request.nextUrl.pathname !== '/') {
         // If no user and trying to access protected route and it is not an API route

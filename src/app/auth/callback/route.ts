@@ -8,7 +8,14 @@ export async function GET(request: Request) {
 
     if (code) {
         const supabase = await createClient()
-        await supabase.auth.exchangeCodeForSession(code)
+        const { error } = await supabase.auth.exchangeCodeForSession(code)
+
+        if (error) {
+            console.error("[Auth Callback] Error exchanging code:", error.message)
+            const errorUrl = new URL("/forgot-password", requestUrl.origin)
+            errorUrl.searchParams.set("error", "expired")
+            return NextResponse.redirect(errorUrl)
+        }
     }
 
     return NextResponse.redirect(new URL(next, requestUrl.origin))
