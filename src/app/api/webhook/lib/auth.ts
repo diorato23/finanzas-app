@@ -76,7 +76,7 @@ export async function authenticateWebhook(req: NextRequest, body: Record<string,
                 ok: false,
                 response: NextResponse.json({
                     success: true, // success = true para que o n8n formate como mensagem normal do bot
-                    message: "🔒 *¡El período de prueba ha terminado!*\n\nEsperamos que hayas disfrutado de Finanzas App. Para seguir registrando gastos, pide al administrador principal de tu grupo familiar que renueve la suscripción o hazlo tú mismo aquí: https://bolsillo.ktuche.com"
+                    message: "🔒 *¡El período de prueba ha terminado!*\n\nEsperamos que hayas disfrutado de Finanzas App. Para seguir registrando gastos, pide al administrador principal de tu grupo familiar que renueve la suscripción o hazlo tú mismo aquí: https://finanzas.ktuche.com"
                 })
             };
         }

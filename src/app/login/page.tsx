@@ -37,7 +37,7 @@ export default function LoginPage({ searchParams }: { searchParams: Promise<{ er
                     <div className="w-11 h-11 rounded-2xl bg-indigo-500 flex items-center justify-center shadow-lg shadow-indigo-500/30">
                         <WalletIcon className="w-6 h-6 text-white" />
                     </div>
-                    <span className="text-2xl font-bold text-white tracking-tight">Bolsillo</span>
+                    <span className="text-2xl font-bold text-white tracking-tight">Finanza</span>
                 </div>
 
                 {/* Tabs */}
@@ -258,7 +258,7 @@ export default function LoginPage({ searchParams }: { searchParams: Promise<{ er
                     </form>
                 )}
 
-                <p className="text-center text-xs text-white/20 mt-4">Bolsillo v3.0 · Finanzas Familiares</p>
+                <p className="text-center text-xs text-white/20 mt-4">Finanza v3.0 · Finanzas Familiares</p>
             </div>
         </div>
     )

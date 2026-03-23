@@ -6,15 +6,15 @@ services:
       args:
         NEXT_PUBLIC_SUPABASE_URL: ${NEXT_PUBLIC_SUPABASE_URL}
         NEXT_PUBLIC_SUPABASE_ANON_KEY: ${NEXT_PUBLIC_SUPABASE_ANON_KEY}
-        NEXT_PUBLIC_SITE_URL: ${NEXT_PUBLIC_SITE_URL:-https://bolsillo.ktuche.com}
+        NEXT_PUBLIC_SITE_URL: ${NEXT_PUBLIC_SITE_URL:-https://finanzas.ktuche.com}
     container_name: finanzas-app
     restart: always
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.bolsillo_app.rule=Host(`bolsillo.ktuche.com`)"
-      - "traefik.http.routers.bolsillo_app.entrypoints=websecure"
-      - "traefik.http.routers.bolsillo_app.tls.certresolver=mytlschallenge"
-      - "traefik.http.services.bolsillo_app.loadbalancer.server.port=3000"
+      - "traefik.http.routers.finanzas_app.rule=Host(`finanzas.ktuche.com`)"
+      - "traefik.http.routers.finanzas_app.entrypoints=websecure"
+      - "traefik.http.routers.finanzas_app.tls.certresolver=mytlschallenge"
+      - "traefik.http.services.finanzas_app.loadbalancer.server.port=3000"
     env_file:
       - .env
     environment:
