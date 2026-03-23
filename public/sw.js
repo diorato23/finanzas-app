@@ -1,6 +1,6 @@
 // Versão do cache — incrementar a cada deploy para forçar atualização
-const CACHE_VERSION = 'v4';
-const CACHE_NAME = `bolsillo-${CACHE_VERSION}`;
+const CACHE_VERSION = 'v5';
+const CACHE_NAME = `finanza-${CACHE_VERSION}`;
 
 const ASSETS_TO_CACHE = [
     '/',
