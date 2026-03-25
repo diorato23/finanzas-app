@@ -36,7 +36,6 @@ export default async function SubscriptionPage() {
         }
     }
 
-    // Se não estiver em trial expirado ou se já for premium, manda pro dashboard
     if (activeSubscriptionStatus === 'active') {
         redirect("/dashboard")
     }
@@ -49,10 +48,9 @@ export default async function SubscriptionPage() {
         }
     }
     
-    // Wait, the user said the security layer is for the owner. Admin is the owner.
     const isOwner = perfil?.rol === 'admin';
 
-    const adminWhatsApp = process.env.NEXT_PUBLIC_ADMIN_WHATSAPP || "573000000000" // Configure no .env
+    const adminWhatsApp = process.env.NEXT_PUBLIC_ADMIN_WHATSAPP || "573000000000"
     const message = encodeURIComponent(`Hola, soy ${perfil?.nombre} (${perfil?.whatsapp}). Mi prueba gratuita terminó y quiero adquirir Premium.`)
     const wpLink = `https://wa.me/${adminWhatsApp}?text=${message}`
 
@@ -109,7 +107,7 @@ export default async function SubscriptionPage() {
                                 <CreditCard size={16} /> Medios de Pago Disponibles:
                             </h3>
                             <div className="flex gap-2 justify-center">
-                                <a href={wpLink} target="_blank" rel="noopener noreferrer" className="bg-purple-100 hover:bg-purple-200 text-purple-700 dark:bg-purple-900/30 dark:hover:bg-purple-900/50 dark:text-purple-400 text-xs font-bold px-3 py-1.5 rounded-md flex items-center gap-1 transition-colors cursor-pointer">
+                                <a href={wpLink} target="_blank" rel="noopener noreferrer" className="bg-emerald-100 hover:bg-emerald-200 text-emerald-700 dark:bg-emerald-900/30 dark:hover:bg-emerald-900/50 dark:text-emerald-400 text-xs font-bold px-3 py-1.5 rounded-md flex items-center gap-1 transition-colors cursor-pointer">
                                     <Smartphone size={14} /> Nequi
                                 </a>
                                 <a href={wpLink} target="_blank" rel="noopener noreferrer" className="bg-yellow-100 hover:bg-yellow-200 text-yellow-800 dark:bg-yellow-900/30 dark:hover:bg-yellow-900/50 dark:text-yellow-500 text-xs font-bold px-3 py-1.5 rounded-md flex items-center gap-1 transition-colors cursor-pointer">
