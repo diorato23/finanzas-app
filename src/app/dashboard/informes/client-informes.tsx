@@ -2,9 +2,10 @@
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import dynamic from 'next/dynamic'
-import { TrendingUp, TrendingDown, ArrowRightLeft, Printer, FileText } from "lucide-react"
+import { TrendingUp, TrendingDown, ArrowRightLeft, Printer, FileText, Users } from "lucide-react"
 import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
+import type { IntegranteData } from "./page"
 
 // Carregamento dinâmico para reduzir bundle size inicial
 const ResponsiveContainer = dynamic(() => import('recharts').then(mod => mod.ResponsiveContainer), { ssr: false })
@@ -39,7 +40,7 @@ export type CategoriaData = {
     nombre: string
 }
 
-export function InformeClient({ categories }: { categories: CategoriaData[] }) {
+export function InformeClient({ categories, integrantes }: { categories: CategoriaData[], integrantes: IntegranteData[] }) {
     const [mounted, setMounted] = useState(false)
     const [chartData, setChartData] = useState<InformeData[] | null>(null)
     const [isPending, setIsPending] = useState(false)
@@ -97,11 +98,15 @@ export function InformeClient({ categories }: { categories: CategoriaData[] }) {
         const inicio = formData.get("fechaInicio") as string
         const fin = formData.get("fechaFin") as string
         const cat = formData.get("categoria") as string
+        const userId = formData.get("userId") as string
 
         // Montar label de período para exibir no gráfico
         const fmtDate = (d: string) => new Date(d + 'T12:00:00').toLocaleDateString('es-CO', { day: '2-digit', month: 'short', year: 'numeric' })
         const catLabel = cat && cat !== 'todas' ? ` · ${getCategoryWithEmoji(cat)}` : ''
-        setPeriodoLabel(`${fmtDate(inicio)} — ${fmtDate(fin)}${catLabel}`)
+        const memberLabel = userId && userId !== 'todos'
+            ? ` · ${integrantes.find(i => i.id === userId)?.nombre ?? 'Integrante'}`
+            : integrantes.length > 0 ? ' · Toda la Familia' : ''
+        setPeriodoLabel(`${fmtDate(inicio)} — ${fmtDate(fin)}${catLabel}${memberLabel}`)
 
         try {
             const { generarInforme } = await import('./actions')
@@ -170,6 +175,28 @@ export function InformeClient({ categories }: { categories: CategoriaData[] }) {
                                 ))}
                             </select>
                         </div>
+                        {/* Filtro de Integrante — apenas para admins (integrantes.length > 0) */}
+                        {integrantes.length > 0 && (
+                            <div className="space-y-2 w-full md:w-auto flex-1">
+                                <label htmlFor="userId" className="text-sm font-medium text-foreground flex items-center gap-1.5">
+                                    <Users className="w-4 h-4 text-primary" />
+                                    Integrante
+                                </label>
+                                <select
+                                    id="userId"
+                                    name="userId"
+                                    defaultValue="todos"
+                                    className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                                >
+                                    <option value="todos">👨‍👩‍👧 Toda la Familia</option>
+                                    {integrantes.map(i => (
+                                        <option key={i.id} value={i.id}>
+                                            {i.rol === 'admin' ? '👑' : i.rol === 'co_admin' ? '⭐' : '👤'} {i.nombre}
+                                        </option>
+                                    ))}
+                                </select>
+                            </div>
+                        )}
                         <div className="space-y-2 w-full md:w-auto flex-[0.5]">
                             <label htmlFor="agruparPor" className="text-sm font-medium text-foreground">Agrupar por</label>
                             <select
@@ -184,7 +211,7 @@ export function InformeClient({ categories }: { categories: CategoriaData[] }) {
                             </select>
                         </div>
                         <div className="w-full md:w-auto">
-                            <Button type="submit" disabled={isPending} className="w-full md:w-auto bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl shadow-lg shadow-indigo-500/20 px-6">
+                            <Button type="submit" disabled={isPending} className="w-full md:w-auto bg-primary hover:bg-primary/90 text-white rounded-xl shadow-lg shadow-primary/20 px-6">
                                 {isPending ? "Generando..." : (
                                     <>
                                         <FileText className="w-4 h-4 mr-2" />
@@ -246,7 +273,7 @@ export function InformeClient({ categories }: { categories: CategoriaData[] }) {
                                 <div>
                                     <CardTitle className="text-xl font-bold">Evolución de Ingresos y Gastos</CardTitle>
                                     {periodoLabel && (
-                                        <CardDescription className="mt-1 text-sm font-medium text-indigo-500 dark:text-indigo-400">
+                                        <CardDescription className="mt-1 text-sm font-medium text-primary">
                                             📅 {periodoLabel}
                                         </CardDescription>
                                     )}
@@ -301,20 +328,20 @@ export function InformeClient({ categories }: { categories: CategoriaData[] }) {
                                                     type="monotone"
                                                     dataKey="ingresos"
                                                     name="Ingresos"
-                                                    stroke="#4f46e5" /* Indigo 600 - Match Reference 1 */
+                                                    stroke="#10b981"
                                                     strokeWidth={3}
-                                                    dot={{ r: 4, strokeWidth: 3, fill: 'var(--card)', stroke: '#4f46e5' }}
-                                                    activeDot={{ r: 6, strokeWidth: 0, fill: '#4f46e5' }}
+                                                    dot={{ r: 4, strokeWidth: 3, fill: 'var(--card)', stroke: '#10b981' }}
+                                                    activeDot={{ r: 6, strokeWidth: 0, fill: '#10b981' }}
                                                     animationDuration={1500}
                                                 />
                                                 <Line
                                                     type="monotone"
                                                     dataKey="gastos"
                                                     name="Gastos"
-                                                    stroke="#8b5cf6" /* Violet 500 - Match Reference 2 */
+                                                    stroke="#f43f5e"
                                                     strokeWidth={3}
-                                                    dot={{ r: 4, strokeWidth: 3, fill: 'var(--card)', stroke: '#8b5cf6' }}
-                                                    activeDot={{ r: 6, strokeWidth: 0, fill: '#8b5cf6' }}
+                                                    dot={{ r: 4, strokeWidth: 3, fill: 'var(--card)', stroke: '#f43f5e' }}
+                                                    activeDot={{ r: 6, strokeWidth: 0, fill: '#f43f5e' }}
                                                     animationDuration={1500}
                                                 />
                                             </LineChart>

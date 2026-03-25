@@ -2,6 +2,12 @@ import { createClient } from "@/lib/supabase/server"
 import { redirect } from "next/navigation"
 import { InformeClient, CategoriaData } from "./client-informes"
 
+export type IntegranteData = {
+    id: string
+    nombre: string
+    rol: string
+}
+
 export default async function InformesPage() {
     const supabase = await createClient()
     const { data: { user } } = await supabase.auth.getUser()
@@ -19,6 +25,18 @@ export default async function InformesPage() {
     if (!perfil) redirect("/dashboard")
 
     const isAdmin = perfil.rol === 'admin' || perfil.rol === 'co_admin'
+
+    // Buscar integrantes da família (apenas visível ao admin)
+    let integrantes: IntegranteData[] = []
+    if (isAdmin && perfil.familia_id) {
+        const { data: membros } = await supabase
+            .from("perfiles")
+            .select("id, nombre, rol")
+            .eq("familia_id", perfil.familia_id)
+            .order("nombre", { ascending: true })
+
+        integrantes = membros ?? []
+    }
 
     // Obter as categorias ativas do usuário para preencher o filtro
     const { data: categorias } = await supabase
@@ -47,7 +65,7 @@ export default async function InformesPage() {
                 </div>
             </div>
 
-            <InformeClient categories={categories} />
+            <InformeClient categories={categories} integrantes={integrantes} />
         </div>
     )
 }

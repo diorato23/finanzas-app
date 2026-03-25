@@ -7,7 +7,8 @@ const informeSchema = z.object({
     fechaInicio: z.string(),
     fechaFin: z.string(),
     agruparPor: z.string().default("mes"),
-    categoria: z.string().optional()
+    categoria: z.string().optional(),
+    userId: z.string().optional()
 })
 
 export async function generarInforme(formData: FormData) {
@@ -15,14 +16,15 @@ export async function generarInforme(formData: FormData) {
         fechaInicio: formData.get("fechaInicio"),
         fechaFin: formData.get("fechaFin"),
         agruparPor: formData.get("agruparPor"),
-        categoria: formData.get("categoria")
+        categoria: formData.get("categoria"),
+        userId: formData.get("userId") || undefined
     })
 
     if (!result.success) {
         return { error: "Datos de formulario inválidos." }
     }
 
-    const { fechaInicio, fechaFin, categoria } = result.data
+    const { fechaInicio, fechaFin, categoria, userId } = result.data
 
     const supabase = await createClient()
     const { data: { user } } = await supabase.auth.getUser()
@@ -37,6 +39,18 @@ export async function generarInforme(formData: FormData) {
     if (!perfil) return { error: "Perfil no encontrado." }
 
     const isAdmin = perfil.rol === 'admin' || perfil.rol === 'co_admin'
+
+    // Buscar nome do integrante filtrado (se for o caso)
+    let memberName: string | null = null
+    if (isAdmin && userId && userId !== 'todos') {
+        const { data: memberPerfil } = await supabase
+            .from("perfiles")
+            .select("nombre")
+            .eq("id", userId)
+            .single()
+        memberName = memberPerfil?.nombre ?? null
+    }
+
     let query = supabase
         .from("transacciones")
         .select("tipo, monto, created_at, categoria")
@@ -44,7 +58,10 @@ export async function generarInforme(formData: FormData) {
         .gte("created_at", `${fechaInicio}T00:00:00`)
         .lte("created_at", `${fechaFin}T23:59:59`)
 
-    if (!isAdmin) {
+    // Filtro por integrante: admin filtra por userId selecionado, dependente sempre vê só o próprio
+    if (isAdmin && userId && userId !== 'todos') {
+        query = query.eq("user_id", userId)
+    } else if (!isAdmin) {
         query = query.eq("user_id", user.id)
     }
 
@@ -135,5 +152,5 @@ export async function generarInforme(formData: FormData) {
         gastos: arrayData[key].gastos
     }))
 
-    return { success: true, data: chartData }
+    return { success: true, data: chartData, memberName }
 }
