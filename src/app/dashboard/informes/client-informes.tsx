@@ -100,7 +100,6 @@ export function InformeClient({ categories, integrantes }: { categories: Categor
         const cat = formData.get("categoria") as string
         const userId = formData.get("userId") as string
 
-        // Montar label de período para exibir no gráfico
         const fmtDate = (d: string) => new Date(d + 'T12:00:00').toLocaleDateString('es-CO', { day: '2-digit', month: 'short', year: 'numeric' })
         const catLabel = cat && cat !== 'todas' ? ` · ${getCategoryWithEmoji(cat)}` : ''
         const memberLabel = userId && userId !== 'todos'
@@ -124,7 +123,6 @@ export function InformeClient({ categories, integrantes }: { categories: Categor
         }
     }
 
-    // Default dates for the form (last 6 months to today)
     const initDate = new Date()
     const endDateStr = initDate.toISOString().split('T')[0]
     initDate.setMonth(initDate.getMonth() - 5)
@@ -175,7 +173,6 @@ export function InformeClient({ categories, integrantes }: { categories: Categor
                                 ))}
                             </select>
                         </div>
-                        {/* Filtro de Integrante — apenas para admins (integrantes.length > 0) */}
                         {integrantes.length > 0 && (
                             <div className="space-y-2 w-full md:w-auto flex-1">
                                 <label htmlFor="userId" className="text-sm font-medium text-foreground flex items-center gap-1.5">
@@ -246,7 +243,7 @@ export function InformeClient({ categories, integrantes }: { categories: Categor
                                     <Card className="rounded-[20px] bg-rose-50/50 dark:bg-rose-950/20 border-rose-100 dark:border-rose-900 overflow-hidden relative">
                                         <CardHeader className="pb-2">
                                             <CardDescription className="font-medium text-rose-600 dark:text-rose-400">Total Gastos</CardDescription>
-                                            <CardTitle className="text-3xl text-rose-700 dark:text-emerald-300">
+                                            <CardTitle className="text-3xl text-rose-700 dark:text-rose-300">
                                                 {formatCurrency(totalGastos)}
                                             </CardTitle>
                                         </CardHeader>
