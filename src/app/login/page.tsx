@@ -23,18 +23,12 @@ export default function LoginPage({ searchParams }: { searchParams: Promise<{ er
     const [signupPassword, setSignupPassword] = useState("")
 
     return (
-        <div className="min-h-screen w-full flex items-center justify-center p-4" style={{
-            background: "linear-gradient(135deg, #1a1040 0%, #2d1b69 40%, #1e3a8a 100%)"
-        }}>
+        <div className="min-h-screen w-full flex items-center justify-center p-4 bg-slate-950 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-emerald-900/40 via-slate-950 to-slate-950" >
             {/* Card glassmorphism */}
-            <div className="w-full max-w-sm rounded-3xl p-6 shadow-2xl" style={{
-                background: "rgba(255,255,255,0.07)",
-                backdropFilter: "blur(24px)",
-                border: "1px solid rgba(255,255,255,0.12)"
-            }}>
+            <div className="w-full max-w-sm rounded-3xl p-6 shadow-2xl bg-white/5 backdrop-blur-xl border border-white/10" >
                 {/* Logo */}
                 <div className="flex items-center gap-3 mb-6">
-                    <div className="w-11 h-11 rounded-2xl bg-indigo-500 flex items-center justify-center shadow-lg shadow-indigo-500/30">
+                    <div className="w-11 h-11 rounded-2xl bg-emerald-500 flex items-center justify-center shadow-lg shadow-emerald-500/30">
                         <WalletIcon className="w-6 h-6 text-white" />
                     </div>
                     <span className="text-2xl font-bold text-white tracking-tight">Finanza</span>
@@ -47,7 +41,7 @@ export default function LoginPage({ searchParams }: { searchParams: Promise<{ er
                         onClick={() => setTab("login")}
                         className={`flex-1 py-2 rounded-xl text-sm font-semibold transition-all duration-200 ${
                             tab === "login"
-                                ? "bg-indigo-600 text-white shadow-md shadow-indigo-900/40"
+                                ? "bg-emerald-600 text-white shadow-md shadow-emerald-900/40"
                                 : "text-white/50 hover:text-white/80"
                         }`}
                     >
@@ -58,7 +52,7 @@ export default function LoginPage({ searchParams }: { searchParams: Promise<{ er
                         onClick={() => setTab("signup")}
                         className={`flex-1 py-2 rounded-xl text-sm font-semibold transition-all duration-200 ${
                             tab === "signup"
-                                ? "bg-indigo-600 text-white shadow-md shadow-indigo-900/40"
+                                ? "bg-emerald-600 text-white shadow-md shadow-emerald-900/40"
                                 : "text-white/50 hover:text-white/80"
                         }`}
                     >
@@ -99,7 +93,7 @@ export default function LoginPage({ searchParams }: { searchParams: Promise<{ er
                                     />
                                 </div>
                                 <div className="text-right">
-                                    <Link href="/forgot-password" className="text-xs text-indigo-300 hover:text-indigo-200 transition-colors">
+                                    <Link href="/forgot-password" className="text-xs text-emerald-300 hover:text-emerald-200 transition-colors">
                                         ¿Olvidaste tu contraseña?
                                     </Link>
                                 </div>
@@ -109,14 +103,14 @@ export default function LoginPage({ searchParams }: { searchParams: Promise<{ er
                             )}
                             <Button
                                 type="submit"
-                                className="w-full h-11 rounded-xl font-bold text-white bg-indigo-600 hover:bg-indigo-500 shadow-lg shadow-indigo-900/40 border-0 mt-2 transition-all"
+                                className="w-full h-11 rounded-xl font-bold text-white bg-emerald-600 hover:bg-emerald-500 shadow-lg shadow-emerald-900/40 border-0 mt-2 transition-all"
                             >
                                 Ingresar
                             </Button>
                         </form>
                         <p className="text-center text-xs text-white/40 pt-1">
                             ¿No tienes cuenta?{" "}
-                            <button onClick={() => setTab("signup")} className="text-indigo-300 font-semibold hover:text-indigo-200">
+                            <button onClick={() => setTab("signup")} className="text-emerald-300 font-semibold hover:text-emerald-200">
                                 Crear Cuenta
                             </button>
                         </p>
@@ -237,21 +231,21 @@ export default function LoginPage({ searchParams }: { searchParams: Promise<{ er
                         <button
                             type="button"
                             onClick={() => setIsDependent(!isDependent)}
-                            className="text-xs text-indigo-300 hover:text-indigo-200 w-full text-center pt-0.5"
+                            className="text-xs text-emerald-300 hover:text-emerald-200 w-full text-center pt-0.5"
                         >
                             {isDependent ? "¿Eres titular? Haz clic aquí." : "¿Te invitaron como dependiente?"}
                         </button>
 
                         <Button
                             type="submit"
-                            className="w-full h-11 rounded-xl font-bold text-white bg-indigo-600 hover:bg-indigo-500 shadow-lg shadow-indigo-900/40 border-0 transition-all"
+                            className="w-full h-11 rounded-xl font-bold text-white bg-emerald-600 hover:bg-emerald-500 shadow-lg shadow-emerald-900/40 border-0 transition-all"
                         >
                             {isDependent ? "Unirme a Familia" : "Crear Grupo Familiar"}
                         </Button>
 
                         <p className="text-center text-xs text-white/40 pt-1">
                             ¿Ya tienes cuenta?{" "}
-                            <button type="button" onClick={() => setTab("login")} className="text-indigo-300 font-semibold hover:text-indigo-200">
+                            <button type="button" onClick={() => setTab("login")} className="text-emerald-300 font-semibold hover:text-emerald-200">
                                 Ingresar
                             </button>
                         </p>
