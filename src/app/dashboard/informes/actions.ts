@@ -15,12 +15,13 @@ export async function generarInforme(formData: FormData) {
     const result = informeSchema.safeParse({
         fechaInicio: formData.get("fechaInicio"),
         fechaFin: formData.get("fechaFin"),
-        agruparPor: formData.get("agruparPor"),
-        categoria: formData.get("categoria"),
+        agruparPor: formData.get("agruparPor") || undefined,
+        categoria: formData.get("categoria") || undefined,
         userId: formData.get("userId") || undefined
     })
 
     if (!result.success) {
+        console.error("Zod Validation Error:", result.error.format())
         return { error: "Datos de formulario inválidos." }
     }
 
