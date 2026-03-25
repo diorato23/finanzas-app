@@ -77,7 +77,7 @@ export async function generarInforme(formData: FormData) {
     
     // Contenedores para diferentes tipos de análisis
     const timelineData: Record<string, { ingresos: number, gastos: number, label: string }> = {}
-    const userComparisonMap: Record<string, { total: number, nombre: string }> = {}
+    const userComparisonMap: Record<string, { ingresos: number, gastos: number, nombre: string }> = {}
     const categoryDetailMap: Record<string, { total: number, count: number }> = {}
     let totalGastosGeral = 0
     let totalIngresosGeral = 0
@@ -90,7 +90,7 @@ export async function generarInforme(formData: FormData) {
 
     if (members) {
         members.forEach(m => {
-            userComparisonMap[m.id] = { total: 0, nombre: m.nombre }
+            userComparisonMap[m.id] = { ingresos: 0, gastos: 0, nombre: m.nombre }
         })
     }
 
@@ -124,13 +124,18 @@ export async function generarInforme(formData: FormData) {
             if (t.tipo === 'cobro') {
                 timelineData[key].ingresos += amount
                 totalIngresosGeral += amount
+
+                // 3a. Ingresos por usuário
+                if (userComparisonMap[t.user_id]) {
+                    userComparisonMap[t.user_id].ingresos += amount
+                }
             } else {
                 timelineData[key].gastos += amount
                 totalGastosGeral += amount
 
-                // 3. Comparação de usuários (apenas gastos)
+                // 3b. Gastos por usuário
                 if (userComparisonMap[t.user_id]) {
-                    userComparisonMap[t.user_id].total += amount
+                    userComparisonMap[t.user_id].gastos += amount
                 }
             }
 
@@ -192,8 +197,10 @@ export async function generarInforme(formData: FormData) {
     
     const userComparison = Object.keys(userComparisonMap).map(id => ({
         nombre: userComparisonMap[id].nombre,
-        total: userComparisonMap[id].total
-    })).sort((a,b) => b.total - a.total)
+        ingresos: userComparisonMap[id].ingresos,
+        gastos: userComparisonMap[id].gastos,
+        balance: userComparisonMap[id].ingresos - userComparisonMap[id].gastos
+    })).sort((a,b) => b.gastos - a.gastos)
 
     return { 
         success: true, 

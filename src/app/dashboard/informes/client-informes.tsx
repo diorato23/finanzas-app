@@ -48,7 +48,9 @@ type CategoryDetail = {
 
 type UserComparison = {
     nombre: string
-    total: number
+    ingresos: number
+    gastos: number
+    balance: number
 }
 
 type InformeResponse = {
@@ -342,7 +344,7 @@ export function InformeClient({ categories, integrantes }: { categories: { nombr
                                         <XAxis type="number" hide />
                                         <YAxis dataKey="nombre" type="category" axisLine={false} tickLine={false} tick={{ fill: '#64748b', fontSize: 12, fontWeight: 800 }} width={80} />
                                         <Tooltip cursor={{fill: 'rgba(16,185,129,0.05)'}} content={<CustomTooltip />} />
-                                        <Bar dataKey="total" name="Total Gastos" radius={[0, 8, 8, 0]} barSize={32}>
+                                        <Bar dataKey="gastos" name="Total Gastos" radius={[0, 8, 8, 0]} barSize={32}>
                                             {reportData.userComparison.map((_, index) => (
                                                 <Cell key={`cell-${index}`} fill={index === 0 ? '#10b981' : '#334155'} />
                                             ))}
@@ -363,18 +365,14 @@ export function InformeClient({ categories, integrantes }: { categories: { nombr
                         </Card>
                     </div>
 
-                    {/* Bottom Row - Detailed List */}
-                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                        <Card className="lg:col-span-3 rounded-[32px] border-slate-200/60 dark:border-slate-800/60 bg-white dark:bg-slate-900/80 shadow-2xl overflow-hidden">
+                    {/* Bottom Row - Detailed Lists */}
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                        {/* Categories Table */}
+                        <Card className="rounded-[32px] border-slate-200/60 dark:border-slate-800/60 bg-white dark:bg-slate-900/80 shadow-2xl overflow-hidden">
                             <CardHeader className="p-8 bg-slate-50 dark:bg-slate-950/20 border-b border-slate-100 dark:border-slate-800">
-                                <div className="flex items-center justify-between">
-                                    <div>
-                                        <CardTitle className="text-xl font-black">Detalle por Categoría</CardTitle>
-                                        <CardDescription className="text-sm font-bold text-emerald-600">Análisis granular orientado a ROI y optimização</CardDescription>
-                                    </div>
-                                    <div className="flex items-center gap-2 bg-white dark:bg-slate-900 px-4 py-2 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800 font-bold text-xs">
-                                        📅 {periodoLabel}
-                                    </div>
+                                <div>
+                                    <CardTitle className="text-xl font-black">Detalle por Categoría</CardTitle>
+                                    <CardDescription className="text-sm font-bold text-emerald-600 uppercase tracking-tighter">Impacto y Frecuencia</CardDescription>
                                 </div>
                             </CardHeader>
                             <CardContent className="p-0">
@@ -383,41 +381,76 @@ export function InformeClient({ categories, integrantes }: { categories: { nombr
                                         <thead>
                                             <tr className="bg-slate-50/50 dark:bg-slate-950/40 text-slate-500 text-[10px] font-black uppercase tracking-[0.2em] border-b border-slate-100 dark:border-slate-800">
                                                 <th className="px-8 py-5">Categoría</th>
-                                                <th className="px-6 py-5">Frecuencia</th>
-                                                <th className="px-6 py-5">Impacto Visual</th>
-                                                <th className="px-6 py-5 text-right">Total Acumulado</th>
+                                                <th className="px-6 py-5 text-center">Op.</th>
+                                                <th className="px-8 py-5 text-right">Monto</th>
                                             </tr>
                                         </thead>
                                         <tbody className="divide-y divide-slate-50 dark:divide-slate-800/50">
                                             {reportData.categoryDetail.map((cat, idx) => (
-                                                <tr key={idx} className="hover:bg-slate-50/50 dark:hover:bg-slate-800/10 transition-colors group">
+                                                <tr key={idx} className="hover:bg-slate-50/50 dark:hover:bg-slate-800/10 transition-colors">
                                                     <td className="px-8 py-5">
-                                                        <div className="flex items-center gap-4">
-                                                            <div className="size-10 rounded-2xl bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-xl shadow-sm group-hover:scale-110 transition-transform">
-                                                                {getCategoryWithEmoji(cat.nombre).split(' ')[0]}
-                                                            </div>
-                                                            <div>
-                                                                <p className="font-black text-slate-800 dark:text-slate-200">{cat.nombre}</p>
-                                                                <p className="text-[10px] text-slate-400 font-bold uppercase">ID: {idx + 101}</p>
-                                                            </div>
+                                                        <div className="flex items-center gap-3">
+                                                            <span className="text-lg">{getCategoryWithEmoji(cat.nombre).split(' ')[0]}</span>
+                                                            <span className="font-bold text-slate-700 dark:text-slate-300">{cat.nombre}</span>
                                                         </div>
                                                     </td>
-                                                    <td className="px-6 py-5">
-                                                        <span className="px-3 py-1 bg-slate-100 dark:bg-slate-800 rounded-full text-xs font-black text-slate-500">
-                                                            {cat.count} Ops
+                                                    <td className="px-6 py-5 text-center">
+                                                        <span className="px-2 py-1 bg-slate-100 dark:bg-slate-800 rounded-lg text-xs font-bold text-slate-500">
+                                                            {cat.count}
                                                         </span>
-                                                    </td>
-                                                    <td className="px-6 py-5 min-w-[200px]">
-                                                        <div className="w-full bg-slate-100 dark:bg-slate-800 h-2.5 rounded-full overflow-hidden">
-                                                            <div 
-                                                                className="h-full bg-emerald-500 transition-all duration-1000" 
-                                                                style={{ width: `${cat.porcentaje}%` }} 
-                                                            />
-                                                        </div>
-                                                        <p className="text-[10px] font-black mt-2 text-slate-400">{cat.porcentaje.toFixed(1)}% del total</p>
                                                     </td>
                                                     <td className="px-8 py-5 text-right font-black text-slate-900 dark:text-white">
                                                         {formatCurrency(cat.total)}
+                                                    </td>
+                                                </tr>
+                                            ))}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </CardContent>
+                        </Card>
+
+                        {/* Users Distinction Table */}
+                        <Card className="rounded-[32px] border-slate-200/60 dark:border-slate-800/60 bg-white dark:bg-slate-900/80 shadow-2xl overflow-hidden">
+                            <CardHeader className="p-8 bg-slate-50 dark:bg-slate-950/20 border-b border-slate-100 dark:border-slate-800">
+                                <div className="flex items-center justify-between">
+                                    <div>
+                                        <CardTitle className="text-xl font-black text-slate-900 dark:text-white">Resumen por Integrante</CardTitle>
+                                        <CardDescription className="text-sm font-bold text-emerald-600 uppercase tracking-tighter">Distinción de Ingresos y Gastos</CardDescription>
+                                    </div>
+                                    <Users className="w-5 h-5 text-emerald-500 opacity-50" />
+                                </div>
+                            </CardHeader>
+                            <CardContent className="p-0">
+                                <div className="overflow-x-auto">
+                                    <table className="w-full text-left">
+                                        <thead>
+                                            <tr className="bg-slate-50/50 dark:bg-slate-950/40 text-slate-500 text-[10px] font-black uppercase tracking-[0.2em] border-b border-slate-100 dark:border-slate-800">
+                                                <th className="px-8 py-5">Nombre</th>
+                                                <th className="px-6 py-5 text-right font-black text-emerald-500">Ingresos</th>
+                                                <th className="px-6 py-5 text-right font-black text-rose-500">Gastos</th>
+                                                <th className="px-8 py-5 text-right font-black">Neto</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody className="divide-y divide-slate-50 dark:divide-slate-800/50">
+                                            {reportData.userComparison.map((user, idx) => (
+                                                <tr key={idx} className="hover:bg-slate-50/50 dark:hover:bg-slate-800/10 transition-colors">
+                                                    <td className="px-8 py-4">
+                                                        <div className="flex items-center gap-3">
+                                                            <div className="size-8 rounded-full bg-emerald-500/10 flex items-center justify-center font-black text-emerald-600 text-xs">
+                                                                {user.nombre.charAt(0)}
+                                                            </div>
+                                                            <span className="font-bold text-slate-800 dark:text-slate-200">{user.nombre}</span>
+                                                        </div>
+                                                    </td>
+                                                    <td className="px-6 py-4 text-right text-emerald-600 dark:text-emerald-400 font-bold text-sm">
+                                                        {formatCurrency(user.ingresos)}
+                                                    </td>
+                                                    <td className="px-6 py-4 text-right text-rose-500 font-bold text-sm">
+                                                        {formatCurrency(user.gastos)}
+                                                    </td>
+                                                    <td className={`px-8 py-4 text-right font-black text-sm ${user.balance >= 0 ? "text-emerald-600 dark:text-emerald-400" : "text-rose-600 dark:text-rose-400"}`}>
+                                                        {formatCurrency(user.balance)}
                                                     </td>
                                                 </tr>
                                             ))}
