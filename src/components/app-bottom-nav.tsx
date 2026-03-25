@@ -49,15 +49,7 @@ export function AppBottomNav({ isAdmin, hasFamily }: { isAdmin: boolean, hasFami
     ]
 
     return (
-        <nav data-glass className="md:hidden fixed bottom-0 left-0 right-0 h-[72px] flex items-center justify-around px-2 z-50 pb-safe"
-            style={{
-                background: "rgba(255,255,255,0.75)",
-                backdropFilter: "blur(20px)",
-                WebkitBackdropFilter: "blur(20px)",
-                borderTop: "1px solid rgba(79,70,229,0.12)",
-                boxShadow: "0 -1px 24px 0 rgba(79,70,229,0.06)"
-            }}
-        >
+        <nav className="md:hidden fixed bottom-0 left-0 right-0 h-[72px] flex items-center justify-around px-2 z-50 pb-safe bg-background/80 backdrop-blur-xl border-t border-border shadow-[0_-4px_24px_rgba(0,0,0,0.02)] transition-colors duration-300">
             {navItems.map((item) => {
                 const isActive = pathname === item.url
                 const Icon = item.icon
@@ -74,7 +66,7 @@ export function AppBottomNav({ isAdmin, hasFamily }: { isAdmin: boolean, hasFami
                         <div className={`relative p-1.5 rounded-full transition-all ${isActive ? "bg-primary/10" : ""}`}>
                             <Icon className="w-5 h-5" />
                         </div>
-                        <span className={`text-[10px] font-medium ${isActive ? "font-semibold" : ""}`}>
+                        <span className={`text-[11px] font-medium tracking-tight ${isActive ? "font-semibold" : ""}`}>
                             {item.title}
                         </span>
                     </Link>

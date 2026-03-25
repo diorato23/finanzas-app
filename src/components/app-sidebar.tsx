@@ -100,7 +100,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 
     return (
         <Sidebar className="border-r border-border-light bg-card" {...props}>
-            <div className="absolute inset-x-0 top-0 h-[160px] bg-gradient-to-br from-primary-bg to-transparent pointer-events-none" />
+            <div className="absolute inset-x-0 top-0 h-[160px] bg-gradient-to-br from-accent/50 to-transparent pointer-events-none transition-colors duration-300" />
 
             <SidebarHeader>
                 <SidebarMenu>
@@ -135,7 +135,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                                 >
                                     <a href={item.url} className="flex items-center gap-3 py-3 w-full relative z-10">
                                         <item.icon className="size-4 shrink-0 transition-transform group-hover:scale-110" />
-                                        <span className="text-[13.5px] font-medium tracking-wide">{item.title}</span>
+                                        <span className="text-sm font-medium tracking-wide">{item.title}</span>
                                     </a>
                                 </SidebarMenuButton>
                             </SidebarMenuItem>

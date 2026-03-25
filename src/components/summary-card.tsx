@@ -35,7 +35,7 @@ export function SummaryCard({
                     "p-2 rounded-xl",
                     variant === "success" && "bg-emerald-500/10 text-emerald-500",
                     variant === "danger" && "bg-rose-500/10 text-rose-500",
-                    variant === "default" && "bg-blue-500/10 text-blue-500"
+                    variant === "default" && "bg-primary/10 text-primary"
                 )}>
                     <Icon className="h-5 w-5" />
                 </div>
@@ -53,7 +53,7 @@ export function SummaryCard({
                     "mt-3 h-1 w-full rounded-full opacity-20",
                     variant === "success" && "bg-emerald-500",
                     variant === "danger" && "bg-rose-500",
-                    variant === "default" && "bg-blue-500"
+                    variant === "default" && "bg-primary"
                 )} />
             </CardContent>
         </Card>
