@@ -35,4 +35,4 @@
 
 ## Contato
 
-Desenvolvido por **Dioran Rodriguez** - diorato@live.com
+Desenvolvido por **Rafael Diorato** - diorato@live.com
