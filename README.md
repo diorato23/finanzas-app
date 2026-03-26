@@ -1,1 +1,53 @@
-IyDwn5KwIEZpbmFuemFzLUFQUCAtLS0gQWdlbnRlIEZpbmFuY2Vpcm8gRmFtaWxpYXIKCj4gQ29udHJvbGUgZmluYW5jZWlybyBwZXNzb2FsIGUgZmFtaWxpYXIgY29tIElBIHZpYSBXaGF0c0FwcC4gU2ltcGxlcyBjb21vIGVudmlhciB1bWEgbWVuc2FnZW0uCgotLS0KCiMjIPCfkqEgUGFyYSBxdWVtIG7Do28gw6kgdMOpY25pY28KCioqQ29tbyBmdW5jaW9uYToqKgotIFZvY8OqIG1hbmRhIHVtYSBtZW5zYWdlbSBubyBXaGF0c0FwcDogImdhc3RlaSA1MC4wMDAgbm8gc3VwZXJtZXJjYWRvIgotIE8gYXNzaXN0ZW50ZSBkZSBJQSByZWdpc3RyYSBhdXRvbWF0aWNhbWVudGUKLSBObyBhcHAgdm9jw6ogdsOqIGdyw6FmaWNvcyBkZSBxdWFudG8gZ2FzdG91IHBvciBjYXRlZ29yaWEKLSBBIElBIGF2aXNhIHF1YW5kbyBzZXUgZ2FzdG8gZXN0w6EgYWNpbWEgZG8gbm9ybWFsCgoqKlBhcmEgdG9kYSBhIGZhbcOtbGlhOioqCi0gQ2FkYSBtZW1icm8gZGEgZmFtw61saWEgdGVtIHNldSBwZXJmaWwKLSBPIGFwcCBtb3N0cmEgcXVlbSBnYXN0b3UgbWFpcyBlbSBjYWRhIGNhdGVnb3JpYQotIFJlbGF0w7NyaW9zIG1lbnNhaXMgY29tcGFyYXRpdm9zCgotLS0KCiMjIPCfk7ggUHJldmlldyBkbyBBcHAKCiFbUHJldmlldyBGaW5hbnphcy1BUFBdKHByZXZpZXcucG5nKQoKLS0tCgojIyDinIUgRnVuY2lvbmFsaWRhZGVzCgotIFJlZ2lzdHJvIGRlIGdhc3RvcyB2aWEgV2hhdHNBcHAgY29tIElBCi0gRGFzaGJvYXJkIGNvbSBncsOhZmljb3MgZGUgcmVjZWl0YXMgeCBkZXNwZXNhcwotIENhdGVnb3JpemHDp8OjbyBhdXRvbcOhdGljYSAoQWxpbWVudGHDp8OjbywgVHJhbnNwb3J0ZSwgU2HDode5ZGUuLi4pCi0gUGVyZmlzIGZhbWlsaWFyZXMgc2VwYXJhZG9zCi0gQW7DoWxpc2UgY29tcGFyYXRpdmEgbWVuc2FsCi0gQWxlcnRhcyBpbnRlbGlnZW50ZXMgZGEgSUEKCi0tLQoKIyMg8J+bsyBTdGFjayBUw6luaWNhCgp8IFRlY25vbG9naWEgfCBVc28gfAp8LS0tLS0tLS0tLS18LS0tLS18CnwgTmV4dC5qcyAxNSB8IEZyb250ZW5kIHdlYiB8CnwgU3VwYWJhc2UgfCBCYW5jbyBkZSBkYWRvcyArIEF1dGggfAp8IG44biB8IEF1dG9tYcOnw6NvIGRlIHdvcmtmbG93cyB8CnwgV2hhdHNBcHAgQnVzaW5lc3MgQVBJIHwgSW50ZWdyYcOnw6NvIGRlIG1lbnNhZ2VucyB8CnwgR29vZ2xlIEdlbWluaSBBSSB8IFByb2Nlc3NhbWVudG8gZGUgbGluZ3VhZ2VtIG5hdHVyYWwgfAoKLS0tCgojIyDwn5OsIENvbnRhdG8KCkRlc2Vudm9sdmlkbyBwb3IgKipEaW9yYW4gUm9kcsOtZ3VleiogwrcgZGlvcmF0b0BsaXZlLmNvbQo=
+﻿# Finanzas-APP - Agente Financeiro Familiar
+
+> Controle financeiro pessoal e familiar com IA via WhatsApp. Simples como enviar uma mensagem.
+
+---
+
+## Para quem nao e tecnico
+
+**Como funciona:**
+- Voce manda uma mensagem no WhatsApp: "gastei 50.000 no supermercado"
+- O assistente de IA registra automaticamente
+- No app voce ve graficos de quanto gastou por categoria
+- A IA avisa quando seu gasto esta acima do normal
+
+**Para toda a familia:**
+- Cada membro da familia tem seu perfil
+- O app mostra quem gastou mais em cada categoria
+- Relatorios mensais comparativos
+
+---
+
+## Preview do App
+
+![Preview Finanzas-APP](preview.png)
+
+---
+
+## Funcionalidades
+
+- Registro de gastos via WhatsApp com IA
+- Dashboard com graficos de receitas x despesas
+- Categorizacao automatica (Alimentacao, Transporte, Saude...)
+- Perfis familiares separados
+- Analise comparativa mensal
+- Alertas inteligentes da IA
+
+---
+
+## Stack Tecnica
+
+| Tecnologia | Uso |
+|-----------|-----|
+| Next.js 15 | Frontend web |
+| Supabase | Banco de dados + Auth |
+| n8n | Automacao de workflows |
+| WhatsApp Business API | Integracao de mensagens |
+| Google Gemini AI | Processamento de linguagem natural |
+
+---
+
+## Contato
+
+Desenvolvido por **Dioran Rodriguez** - diorato@live.com
